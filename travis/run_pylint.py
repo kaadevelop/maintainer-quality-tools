@@ -8,7 +8,6 @@ import os
 import re
 import sys
 
-
 import click
 import pylint.lint
 
@@ -31,7 +30,6 @@ def get_extra_params(odoo_version, disable_pylint=None):
     Use a seudo-inherit of configuration file.
     To avoid have a 2 config files (stable and pr-conf) by each odoo-version
     Example:
-
         pylint_master.conf
         pylint_master_pr.conf
         pylint_90.conf
@@ -43,21 +41,15 @@ def get_extra_params(odoo_version, disable_pylint=None):
         pylint_61.conf
         pylint_61_pr.conf
         ... and new future versions.
-
     If you need add a new conventions in all versions
     you will need change all pr files or stables files.
-
-
     With this method you can use:
-
         pylint_lastest.conf
         pylint_lastest_pr.conf
         pylint_disabling_70.conf <- Overwrite params of pylint_lastest*.conf
         pylint_disabling_61.conf <- Overwrite params of pylint_lastest*.conf
-
     If you need add a new conventions in all versions you will need change just
     pylint_lastest_pr.conf or pylint_lastest.conf, similar to inherit.
-
     :param version: String with name of version of odoo
     :return: List of extra pylint params
     """
@@ -76,9 +68,6 @@ def get_extra_params(odoo_version, disable_pylint=None):
     if disable_pylint:
         extra_params.extend([
             '--extra-params', '--disable=%s' % disable_pylint])
-
-    print('------------------------disable_pylint----------------')
-    print(disable_pylint)
 
     odoo_version = odoo_version.replace('.', '')
     version_cfg = os.path.join(
@@ -162,20 +151,15 @@ def pylint_run(is_pr, version, dir):
     pylint_rcfile_pr = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'cfg', "travis_run_pylint_pr.cfg")
-
     odoo_version = version_validate(version, dir)
     disable_pylint = os.environ.get('DISABLE_PYLINT')
-
     modules_cmd = get_modules_cmd(dir)
     beta_msgs = get_beta_msgs()
     branch_base = get_branch_base()
     extra_params_cmd = get_extra_params(odoo_version, disable_pylint)
     extra_info = "extra_params_cmd %s " % extra_params_cmd
-    print('--------------------extra_info---------------------')
-    print(extra_info)
+    print (extra_info)
     conf = ["--config-file=%s" % (pylint_rcfile)]
-    print('-------------------------------conf----------------------------')
-    print(conf)
     cmd = conf + modules_cmd + extra_params_cmd
 
     real_errors = main(cmd, standalone_mode=False)
@@ -184,9 +168,7 @@ def pylint_run(is_pr, version, dir):
             'by_msg') or {}).items() if key not in beta_msgs)
     count_errors = get_count_fails(real_errors, list(beta_msgs))
     count_info = "count_errors %s" % count_errors
-    print('--------------------count_info---------------------')
-    print(count_info)
-
+    print (count_info)
     if is_pr:
         print(travis_helpers.green(
             'Start lint check just in modules changed'))
@@ -218,7 +200,6 @@ def pylint_run(is_pr, version, dir):
                 for val in pr_stats:
                     new_dict[val] = (new_dict.get(val, 0) + pr_stats[val])
                 res = new_dict
-
     return res
 
 
