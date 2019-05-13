@@ -8,7 +8,6 @@ import os
 import re
 import sys
 
-
 import click
 import pylint.lint
 
@@ -76,9 +75,6 @@ def get_extra_params(odoo_version, disable_pylint=None):
     if disable_pylint:
         extra_params.extend([
             '--extra-params', '--disable=%s' % disable_pylint])
-
-    print('------------------------disable_pylint----------------')
-    print(disable_pylint)
 
     odoo_version = odoo_version.replace('.', '')
     version_cfg = os.path.join(
@@ -162,10 +158,8 @@ def pylint_run(is_pr, version, dir):
     pylint_rcfile_pr = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'cfg', "travis_run_pylint_pr.cfg")
-
     odoo_version = version_validate(version, dir)
     disable_pylint = os.environ.get('DISABLE_PYLINT')
-
     modules_cmd = get_modules_cmd(dir)
     beta_msgs = get_beta_msgs()
     branch_base = get_branch_base()
@@ -182,7 +176,6 @@ def pylint_run(is_pr, version, dir):
     count_errors = get_count_fails(real_errors, list(beta_msgs))
     count_info = "count_errors %s" % count_errors
     print(count_info)
-
     if is_pr:
         print(travis_helpers.green(
             'Start lint check just in modules changed'))
