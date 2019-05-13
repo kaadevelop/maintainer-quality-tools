@@ -8,6 +8,7 @@ import os
 import re
 import sys
 
+
 import click
 import pylint.lint
 
@@ -23,7 +24,7 @@ except ImportError:
 CLICK_DIR = click.Path(exists=True, dir_okay=True, resolve_path=True)
 
 
-def get_extra_params(odoo_version):
+def get_extra_params(odoo_version, disable_pylint=None):
     """Get extra pylint params by odoo version
     Transform a seudo-pylint-conf to params,
     it to overwrite base-pylint-conf values.
@@ -72,6 +73,12 @@ def get_extra_params(odoo_version):
     if is_version_number:
         extra_params.extend([
             '--extra-params', '--valid_odoo_versions=%s' % odoo_version])
+    if disable_pylint:
+        extra_params.extend([
+            '--extra-params', '--disable=%s' % disable_pylint])
+
+    print('------------------------disable_pylint----------------')
+    print(disable_pylint)
 
     odoo_version = odoo_version.replace('.', '')
     version_cfg = os.path.join(
@@ -155,13 +162,16 @@ def pylint_run(is_pr, version, dir):
     pylint_rcfile_pr = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'cfg', "travis_run_pylint_pr.cfg")
+
     odoo_version = version_validate(version, dir)
+    disable_pylint = os.environ.get('DISABLE_PYLINT')
+
     modules_cmd = get_modules_cmd(dir)
     beta_msgs = get_beta_msgs()
     branch_base = get_branch_base()
-    extra_params_cmd = get_extra_params(odoo_version)
+    extra_params_cmd = get_extra_params(odoo_version, disable_pylint)
     extra_info = "extra_params_cmd %s " % extra_params_cmd
-    print (extra_info)
+    print(extra_info)
     conf = ["--config-file=%s" % (pylint_rcfile)]
     cmd = conf + modules_cmd + extra_params_cmd
 
@@ -171,7 +181,8 @@ def pylint_run(is_pr, version, dir):
             'by_msg') or {}).items() if key not in beta_msgs)
     count_errors = get_count_fails(real_errors, list(beta_msgs))
     count_info = "count_errors %s" % count_errors
-    print (count_info)
+    print(count_info)
+
     if is_pr:
         print(travis_helpers.green(
             'Start lint check just in modules changed'))
@@ -203,6 +214,7 @@ def pylint_run(is_pr, version, dir):
                 for val in pr_stats:
                     new_dict[val] = (new_dict.get(val, 0) + pr_stats[val])
                 res = new_dict
+
     return res
 
 
