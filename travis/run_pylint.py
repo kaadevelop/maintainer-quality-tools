@@ -171,11 +171,8 @@ def pylint_run(is_pr, version, dir):
     branch_base = get_branch_base()
     extra_params_cmd = get_extra_params(odoo_version, disable_pylint)
     extra_info = "extra_params_cmd %s " % extra_params_cmd
-    print('--------------------extra_info---------------------')
     print(extra_info)
     conf = ["--config-file=%s" % (pylint_rcfile)]
-    print('-------------------------------conf----------------------------')
-    print(conf)
     cmd = conf + modules_cmd + extra_params_cmd
 
     real_errors = main(cmd, standalone_mode=False)
@@ -184,7 +181,6 @@ def pylint_run(is_pr, version, dir):
             'by_msg') or {}).items() if key not in beta_msgs)
     count_errors = get_count_fails(real_errors, list(beta_msgs))
     count_info = "count_errors %s" % count_errors
-    print('--------------------count_info---------------------')
     print(count_info)
 
     if is_pr:
