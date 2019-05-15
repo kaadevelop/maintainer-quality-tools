@@ -30,6 +30,7 @@ def get_extra_params(odoo_version, disable_pylint=None):
     Use a seudo-inherit of configuration file.
     To avoid have a 2 config files (stable and pr-conf) by each odoo-version
     Example:
+
         pylint_master.conf
         pylint_master_pr.conf
         pylint_90.conf
@@ -41,15 +42,21 @@ def get_extra_params(odoo_version, disable_pylint=None):
         pylint_61.conf
         pylint_61_pr.conf
         ... and new future versions.
+
     If you need add a new conventions in all versions
     you will need change all pr files or stables files.
+
+
     With this method you can use:
+
         pylint_lastest.conf
         pylint_lastest_pr.conf
         pylint_disabling_70.conf <- Overwrite params of pylint_lastest*.conf
         pylint_disabling_61.conf <- Overwrite params of pylint_lastest*.conf
+
     If you need add a new conventions in all versions you will need change just
     pylint_lastest_pr.conf or pylint_lastest.conf, similar to inherit.
+
     :param version: String with name of version of odoo
     :return: List of extra pylint params
     """
@@ -92,9 +99,18 @@ def get_extra_params(odoo_version, disable_pylint=None):
 def get_beta_msgs():
     """Get beta msgs from beta.cfg file
     :return: List of strings with beta message names"""
-    beta_cfg = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        'cfg/travis_run_pylint_beta.cfg')
+    travis_build_dir = os.environ.get('TRAVIS_PULL_REQUEST_SLUG')
+    print(travis_build_dir)
+    print('---------------------------------------TRAVIS_PULL_REQUEST_SLUG')
+    find_addons_dev = re.search(r'addons-dev', travis_build_dir)
+    if find_addons_dev:
+        beta_cfg = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            'cfg/travis_run_pylint_beta_addons_dev.cfg')
+    else:
+        beta_cfg = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            'cfg/travis_run_pylint_beta.cfg')
     if not os.path.isfile(beta_cfg):
         return []
     config = ConfigParser.ConfigParser()
@@ -161,7 +177,6 @@ def pylint_run(is_pr, version, dir):
     print (extra_info)
     conf = ["--config-file=%s" % (pylint_rcfile)]
     cmd = conf + modules_cmd + extra_params_cmd
-
     real_errors = main(cmd, standalone_mode=False)
     res = dict(
         (key, value) for key, value in (real_errors.get(
@@ -314,3 +329,4 @@ if __name__ == '__main__':
     except click.ClickException as e:
         e.show()
         exit(e.exit_code)
+

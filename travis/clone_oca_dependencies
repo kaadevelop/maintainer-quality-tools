@@ -34,7 +34,7 @@ import logging
 _logger = logging.getLogger()
 
 
-def parse_depfile(depfile, owner='n1nka'):
+def parse_depfile(depfile, owner='kaadevelop'):
     deps = []
     for line in depfile:
         line = line.strip()
