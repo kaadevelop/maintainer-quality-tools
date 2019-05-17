@@ -104,10 +104,10 @@ def get_beta_msgs():
         'cfg/travis_run_pylint_beta.cfg')
     if not os.path.isfile(beta_cfg):
         return []
-    enable_check_html = []
+    enable_checks_addons_dev_pr = []
     config = ConfigParser.ConfigParser()
     config.read_file(open(beta_cfg))
-    list_enable_checks = [msg.strip() for msg in config.get('MESSAGES CONTROL', 'enable').split(',') if msg.strip()]
+    enable_checks = [msg.strip() for msg in config.get('MESSAGES CONTROL', 'enable').split(',') if msg.strip()]
     travis_pull_request_slug = os.environ.get('TRAVIS_PULL_REQUEST_SLUG')
     is_PR = os.environ.get('TRAVIS_PULL_REQUEST')
     find_addons_dev = re.search(r'addons-dev', str(travis_pull_request_slug))
@@ -116,8 +116,8 @@ def get_beta_msgs():
             os.path.dirname(os.path.realpath(__file__)),
             'cfg/travis_run_pylint_beta_addons_dev.cfg')
         config.read_file(open(beta_cfg_addons_dev_html))
-        enable_check_html = [msg.strip() for msg in config.get('MESSAGES CONTROL', 'enable').split(',') if msg.strip()]
-    list_enable_checks = list_enable_checks + enable_check_html
+        enable_checks_addons_dev_pr = [msg.strip() for msg in config.get('MESSAGES CONTROL', 'enable').split(',') if msg.strip()]
+    list_enable_checks = enable_checks + enable_checks_addons_dev_pr
     return list_enable_checks
 
 
