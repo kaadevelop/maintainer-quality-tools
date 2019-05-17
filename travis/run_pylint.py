@@ -83,7 +83,7 @@ def get_extra_params(odoo_version, disable_pylint=None):
     params = []
     if os.path.isfile(version_cfg):
         config = ConfigParser.ConfigParser()
-        config.readfp(open(version_cfg))
+        config.read_file(open(version_cfg))
         for section in config.sections():
             for option, value in config.items(section):
                 params.extend(['--' + option, value])
@@ -102,7 +102,12 @@ def get_beta_msgs():
     beta_cfg = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'cfg/travis_run_pylint_beta.cfg')
-    beta_cfg_addons_dev_html = beta_cfg
+    if not os.path.isfile(beta_cfg):
+        return []
+    enable_check_html = []
+    config = ConfigParser.ConfigParser()
+    config.read_file(open(beta_cfg))
+    list_enable_checks = [msg.strip() for msg in config.get('MESSAGES CONTROL', 'enable').split(',') if msg.strip()]
     travis_pull_request_slug = os.environ.get('TRAVIS_PULL_REQUEST_SLUG')
     is_PR = os.environ.get('TRAVIS_PULL_REQUEST')
     find_addons_dev = re.search(r'addons-dev', str(travis_pull_request_slug))
@@ -110,15 +115,9 @@ def get_beta_msgs():
         beta_cfg_addons_dev_html = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             'cfg/travis_run_pylint_beta_addons_dev.cfg')
-    if not os.path.isfile(beta_cfg):
-        return []
-    config = ConfigParser.ConfigParser()
-    config_ad = ConfigParser.ConfigParser()
-    config.read_file(open(beta_cfg))
-    config_ad.read_file(open(beta_cfg_addons_dev_html))
-    list_enable_checks = list(
-        set([msg.strip() for msg in config.get('MESSAGES CONTROL', 'enable').split(',') if msg.strip()] +
-            [msg.strip() for msg in config_ad.get('MESSAGES CONTROL', 'enable').split(',') if msg.strip()]))
+        config.read_file(open(beta_cfg_addons_dev_html))
+        enable_check_html = [msg.strip() for msg in config.get('MESSAGES CONTROL', 'enable').split(',') if msg.strip()]
+    list_enable_checks = list_enable_checks + enable_check_html
     return list_enable_checks
 
 
