@@ -96,12 +96,25 @@ def get_extra_params(odoo_version, disable_pylint=None):
     return extra_params
 
 
+def get_beta_cfg():
+    travis_pull_request_slug = os.environ.get('TRAVIS_PULL_REQUEST_SLUG')
+    is_PR = os.environ.get('TRAVIS_PULL_REQUEST')
+    find_addons_dev = re.search(r'addons-dev', str(travis_pull_request_slug))
+    if find_addons_dev and is_PR:
+        beta_cfg = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            'cfg/travis_run_pylint_beta_addons_dev.cfg')
+    else:
+        beta_cfg = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            'cfg/travis_run_pylint_beta.cfg')
+    return beta_cfg
+
+
 def get_beta_msgs():
     """Get beta msgs from beta.cfg file
     :return: List of strings with beta message names"""
-    beta_cfg = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        'cfg/travis_run_pylint_beta.cfg')
+    beta_cfg = get_beta_cfg()
     if not os.path.isfile(beta_cfg):
         return []
     config = ConfigParser.ConfigParser()
