@@ -97,9 +97,9 @@ def get_extra_params(odoo_version, disable_pylint=None):
 
 
 def get_beta_cfg():
-    travis_build_dir = os.environ.get('TRAVIS_PULL_REQUEST_SLUG')
+    travis_pull_request_slug = os.environ.get('TRAVIS_PULL_REQUEST_SLUG')
     is_PR = os.environ.get('TRAVIS_PULL_REQUEST')
-    find_addons_dev = re.search(r'addons-dev', str(travis_build_dir))
+    find_addons_dev = re.search(r'addons-dev', str(travis_pull_request_slug))
     if find_addons_dev and is_PR:
         beta_cfg = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
@@ -181,6 +181,7 @@ def pylint_run(is_pr, version, dir):
     print (extra_info)
     conf = ["--config-file=%s" % (pylint_rcfile)]
     cmd = conf + modules_cmd + extra_params_cmd
+
     real_errors = main(cmd, standalone_mode=False)
     res = dict(
         (key, value) for key, value in (real_errors.get(
@@ -333,4 +334,3 @@ if __name__ == '__main__':
     except click.ClickException as e:
         e.show()
         exit(e.exit_code)
-
