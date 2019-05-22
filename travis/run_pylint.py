@@ -23,7 +23,7 @@ except ImportError:
 CLICK_DIR = click.Path(exists=True, dir_okay=True, resolve_path=True)
 
 
-def get_extra_params(odoo_version, disable_pylint=None, is_addons_dev=None, is_pr=False):
+def get_extra_params(odoo_version, disable_pylint=None, is_addons_dev=None, is_saas_addons=None, is_pr=False):
     """Get extra pylint params by odoo version
     Transform a seudo-pylint-conf to params,
     it to overwrite base-pylint-conf values.
@@ -77,6 +77,9 @@ def get_extra_params(odoo_version, disable_pylint=None, is_addons_dev=None, is_p
     if disable_pylint:
         extra_params.extend([
             '--extra-params', '--disable=%s' % disable_pylint])
+    if is_saas_addons:
+        extra_params.extend([
+            '--extra-params', '--disable=manifest-image'])
 
     odoo_version = odoo_version.replace('.', '')
     version_cfg = os.path.join(
@@ -205,7 +208,8 @@ def pylint_run(is_pr, version, dir):
         conf = ["--config-file=%s" % (pylint_rcfile_pr)]
         travis_pull_request_slug = os.environ.get('TRAVIS_PULL_REQUEST_SLUG')
         is_addons_dev = re.search(r'addons-dev', str(travis_pull_request_slug))
-        extra_params_cmd = get_extra_params(odoo_version, disable_pylint, is_addons_dev, is_pr)
+        is_saas_addons = re.search(r'saas-addons', str(travis_pull_request_slug))
+        extra_params_cmd = get_extra_params(odoo_version, disable_pylint, is_addons_dev, is_saas_addons, is_pr)
         cmd = conf + modules_changed_cmd + extra_params_cmd
         if is_addons_dev:
             beta_msgs += get_beta_msgs_addons_dev_pr()
