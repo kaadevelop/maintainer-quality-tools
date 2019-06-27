@@ -24,6 +24,7 @@ except ImportError:
 CLICK_DIR = click.Path(exists=True, dir_okay=True, resolve_path=True)
 
 
+
 def get_extra_params(odoo_version, disable_pylint=None, is_addons_dev=None, is_pr=False):
     """Get extra pylint params by odoo version
     Transform a seudo-pylint-conf to params,
@@ -99,12 +100,25 @@ def get_extra_params(odoo_version, disable_pylint=None, is_addons_dev=None, is_p
     return extra_params
 
 
+def get_beta_cfg():
+    travis_build_dir = os.environ.get('TRAVIS_PULL_REQUEST_SLUG')
+    is_PR = os.environ.get('TRAVIS_PULL_REQUEST')
+    find_addons_dev = re.search(r'addons-dev', str(travis_build_dir))
+    if find_addons_dev and is_PR:
+        beta_cfg = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            'cfg/travis_run_pylint_beta_addons_dev.cfg')
+    else:
+        beta_cfg = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            'cfg/travis_run_pylint_beta.cfg')
+    return beta_cfg
+
+
 def get_beta_msgs():
     """Get beta msgs from beta.cfg file
     :return: List of strings with beta message names"""
-    beta_cfg = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        'cfg/travis_run_pylint_beta.cfg')
+    beta_cfg = get_beta_cfg()
     if not os.path.isfile(beta_cfg):
         return []
     config = ConfigParser.ConfigParser()
@@ -183,7 +197,6 @@ def pylint_run(is_pr, version, dir):
     print(extra_info)
     conf = ["--config-file=%s" % (pylint_rcfile)]
     cmd = conf + modules_cmd + extra_params_cmd
-
     real_errors = main(cmd, standalone_mode=False)
     res = dict(
         (key, value) for key, value in (real_errors.get(
@@ -350,3 +363,4 @@ if __name__ == '__main__':
     except click.ClickException as e:
         e.show()
         exit(e.exit_code)
+
