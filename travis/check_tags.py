@@ -1,6 +1,7 @@
+import json
 import re
 import requests
-
+import urllib3
 
 DEVELOPMENT_TAGS = [':memo:', ':fire:', ':fire_engine:', ':tv:', ':lock:', ':bath:', ':green_heart:', ':cat:', ':bomb:']
 RELEASE_TAGS = [':tada:', ':zap:', ':sparkles:', ':rainbow:', ':ambulance:', ':heart_eyes:', ':cherries:', ':book:',
@@ -13,7 +14,8 @@ REQUIREMENTS_TAGS_OF_VERSION = [':x:', ':arrow_up:', ':arrow_down:', ':sos:', ':
 
 def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis_branch, version, token):
     symbol_in_branch = re.search(r'-', str(travis_branch))
-
+    print('TRAVIS_REPO_SLUG - %s' % travis_repo_slug)
+    print('TRAVIS_PULL_REQUEST - %s' % travis_pull_request_number)
     #GET /repos/:owner/:repo/pulls/:pull_number/commits
     #See API Github: https://developer.github.com/v3/repos/commits/#list-commits-on-a-repository
     real_errors = {}
@@ -21,12 +23,17 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         return real_errors
     # GET / repos /: owner /:repo / commits
     url_request = 'https://api.github.com/repos/%s/pulls/%s/commits' % (str(travis_repo_slug), str(travis_pull_request_number))
+
     if token:
-        commits = requests.get(url_request, headers={'Authorization': token})
+        http = urllib3.PoolManager()
+        res = http.request('GET', url_request, headers={
+            'Accept': 'application/json',
+            'Authorization': 'token %s' % token,
+        })
+        commits = json.loads(res.data)
     else:
-        commits = requests.get(url_request)
+        commits = requests.get(url_request).json()
     # print('GITHUB API response for commits: %s\n%s', url_request, commits)
-    commits = commits.json()
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
