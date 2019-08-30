@@ -1,7 +1,7 @@
 import re
 import requests
 
-from travis.getaddons import get_modules_changed
+from getaddons import get_modules_changed
 
 DEVELOPMENT_TAGS = [':memo:', ':fire:', ':fire_engine:', ':tv:', ':lock:', ':bath:', ':green_heart:', ':cat:', ':bomb:']
 RELEASE_TAGS = [':tada:', ':zap:', ':sparkles:', ':rainbow:', ':ambulance:', ':heart_eyes:', ':cherries:', ':book:',
@@ -82,7 +82,7 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
 
 def check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch):
     errors_stable_docs = {}
-    # modules_changed = get_modules_changed(travis_build_dir)
+    modules_changed = get_modules_changed(travis_build_dir)
     print('-------------------------modules_changed:\n{}'.format(modules_changed))
     return errors_stable_docs
 
