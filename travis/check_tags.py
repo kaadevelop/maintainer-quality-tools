@@ -1,7 +1,7 @@
 import re
 import requests
 
-from getaddons import get_modules_changed, get_modules_info
+from getaddons import get_modules_changed, get_versions_info
 
 DEVELOPMENT_TAGS = [':memo:', ':fire:', ':fire_engine:', ':tv:', ':lock:', ':bath:', ':green_heart:', ':cat:', ':bomb:']
 RELEASE_TAGS = [':tada:', ':zap:', ':sparkles:', ':rainbow:', ':ambulance:', ':heart_eyes:', ':cherries:', ':book:',
@@ -71,10 +71,9 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
     else:
         errors_stable = check_stable_branch_tags(dev_tag, release_tag, commit)
         errors_commit.update(errors_stable)
-
-    errors_stable_docs = check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug,
-                                                  travis_pull_request_number, travis_branch)
-    errors_commit.update(errors_stable_docs)
+        errors_stable_docs = check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug,
+                                                      travis_pull_request_number, travis_branch)
+        errors_commit.update(errors_stable_docs)
     if any(tag in REQUIREMENTS_TAGS_OF_VERSION for tag in list_tags):
         errors_version = check_version_tags(version_tags, list_tags, commit, version)
         errors_commit.update(errors_version)
@@ -85,7 +84,7 @@ def check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_
     errors_stable_docs = {}
     modules_changed = get_modules_changed(travis_build_dir, travis_branch)
     print('-------------------------modules_changed:\n{}'.format(modules_changed))
-    modules_info = get_modules_info(travis_build_dir)
+    modules_info = get_versions_info(travis_build_dir)
     print('-------------------------modules_info:\n{}'.format(modules_info))
     return errors_stable_docs
 

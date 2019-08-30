@@ -64,6 +64,29 @@ def get_modules_info(path, depth=1):
     return modules
 
 
+def get_versions_info(path, depth=1):
+    """ Return a digest of each installable module's manifest in path repo"""
+    # Avoid empty basename when path ends with slash
+    if not os.path.basename(path):
+        path = os.path.dirname(path)
+
+    modules = {}
+    if os.path.isdir(path) and depth > 0:
+        for module in os.listdir(path):
+            manifest_path = is_module(os.path.join(path, module))
+            if manifest_path:
+                manifest = ast.literal_eval(open(manifest_path).read())
+                if manifest.get('installable', True):
+                    modules[module] = {
+                        'version': manifest.get('version')
+                    }
+            else:
+                deeper_modules = get_modules_info(
+                    os.path.join(path, module), depth-1)
+                modules.update(deeper_modules)
+    return modules
+
+
 def is_addons(path):
     res = get_modules(path) != []
     return res
