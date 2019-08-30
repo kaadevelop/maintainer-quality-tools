@@ -20,11 +20,10 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     #GET /repos/:owner/:repo/pulls/:pull_number/commits
     #See API Github: https://developer.github.com/v3/repos/commits/#list-commits-on-a-repository
     real_errors = {}
-    print('22222222222222222222222222222')
     if not travis_pull_request_number or travis_pull_request_number == "false":
         return real_errors
     # GET / repos /: owner /:repo / commits
-    url_request = 'https://github.it-projects.info/repos/%s/pulls/%s/commits' % (str(travis_repo_slug), str(travis_pull_request_number))
+    url_request = 'https://api.github.com/repos/%s/pulls/%s/commits' % (str(travis_repo_slug), str(travis_pull_request_number))
     resp = requests.get(url_request)
     commits = resp.json()
     if resp.status_code != 200:
@@ -40,7 +39,6 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             first_word = commit.split(' ', 1)[0]
             if first_word == 'Revert':
                 continue
-            print('11111111111111111111111111')
             errors_commit = handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch)
             real_errors.update(errors_commit)
     return real_errors
