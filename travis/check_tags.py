@@ -84,11 +84,11 @@ def check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_
     errors_stable_docs = {}
     modules_changed = get_modules_changed(travis_build_dir, travis_branch)
     print('-------------------------modules_changed:\n{}'.format(modules_changed))
-
+    modules_pr = []
     for module in modules_changed:
         module = re.search(r'/(\w+)$', module)
-        module = module.group(1)
-    modules_info = get_versions_info(travis_build_dir, modules_changed)
+        modules_pr.append(module.group(1))
+    modules_info = get_versions_info(travis_build_dir, modules_pr)
     print('-------------------------modules_info:\n{}'.format(modules_info))
     return errors_stable_docs
 

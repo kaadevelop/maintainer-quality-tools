@@ -64,7 +64,7 @@ def get_modules_info(path, depth=1):
     return modules
 
 
-def get_versions_info(path, modules_changed, depth=1):
+def get_versions_info(path, modules_pr, depth=1):
     """ Return a digest of each installable module's manifest in path repo"""
     # Avoid empty basename when path ends with slash
     if not os.path.basename(path):
@@ -73,9 +73,8 @@ def get_versions_info(path, modules_changed, depth=1):
     modules = {}
     if os.path.isdir(path) and depth > 0:
         listdir = os.listdir(path)
-        print('----------listdir: {}'.format(listdir))
         for module in listdir:
-            if module not in modules_changed:
+            if module not in modules_pr:
                 return modules
             manifest_path = is_module(os.path.join(path, module))
             if manifest_path:
