@@ -75,7 +75,7 @@ def get_versions_info(path, modules_pr, depth=1):
         listdir = os.listdir(path)
         for module in listdir:
             if module not in modules_pr:
-                return modules
+                continue
             manifest_path = is_module(os.path.join(path, module))
             if manifest_path:
                 manifest = ast.literal_eval(open(manifest_path).read())
