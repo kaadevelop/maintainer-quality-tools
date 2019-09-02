@@ -18,6 +18,10 @@ MANIFEST_FILES = [
     '__terp__.py',
 ]
 
+DOC_FILES = [
+    'chengelog.rst',
+    'index.rst'
+]
 
 def is_module(path):
     """return False if the path doesn't contain an odoo module, and the full
@@ -30,6 +34,21 @@ def is_module(path):
     if len(filtered) == 2 and '__init__.py' in filtered:
         return os.path.join(
             path, next(x for x in filtered if x != '__init__.py'))
+    else:
+        return False
+
+
+def get_changelog(path):
+    path += '/doc/'
+    if not os.path.isdir(path):
+        return False
+    files = os.listdir(path)
+    print('--files-- get changelog is {}'.format(files))
+    filtered = [x for x in files if x in (DOC_FILES)]
+    print('--filtered-- get changelog is {}'.format(filtered))
+    if len(filtered) == 2:
+        return os.path.join(
+            path, next(x for x in filtered))
     else:
         return False
 
@@ -77,7 +96,8 @@ def get_versions_info(path, modules_pr, depth=1):
             if module not in modules_pr:
                 continue
             manifest_path = is_module(os.path.join(path, module))
-            print('manifest_path is {}'.format(manifest_path))
+            changelog_path = get_changelog(os.path.join(path, module))
+            print('--changelog_path-- get_versions_info--{}'.format(changelog_path))
             if manifest_path:
                 manifest = ast.literal_eval(open(manifest_path).read())
                 if manifest.get('installable', True):
