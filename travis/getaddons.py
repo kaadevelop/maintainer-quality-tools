@@ -77,6 +77,7 @@ def get_versions_info(path, modules_pr, depth=1):
             if module not in modules_pr:
                 continue
             manifest_path = is_module(os.path.join(path, module))
+            print('manifest_path is {}'.format(manifest_path))
             if manifest_path:
                 manifest = ast.literal_eval(open(manifest_path).read())
                 if manifest.get('installable', True):
