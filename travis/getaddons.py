@@ -38,7 +38,7 @@ def is_module(path):
         return False
 
 
-def get_changelog(path):
+def get_changelog_path(path):
     path += '/doc/'
     if not os.path.isdir(path):
         return False
@@ -95,12 +95,17 @@ def get_versions_info(path, modules_pr, depth=1):
         for module in listdir:
             if module not in modules_pr:
                 continue
+            print('1')
             manifest_path = is_module(os.path.join(path, module))
-            changelog_path = get_changelog(os.path.join(path, module))
+            print('2')
+            changelog_path = get_changelog_path(os.path.join(path, module))
+            print('3')
             if manifest_path:
                 if changelog_path:
+                    print('4')
                     changelog = ast.literal_eval(open(changelog_path).read())
                     print('--changelog get_versions_info is \n{}'.format(changelog))
+                print('5')
                 manifest = ast.literal_eval(open(manifest_path).read())
                 if manifest.get('installable', True):
                     modules[module] = {
