@@ -34,7 +34,9 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             # we don't check merge commits
             continue
         commit = commit.get('commit').get('message')
+        tree = commit.get('commit').get('tree').get('url')
         print('Commit: %s' % commit)
+        print('tree: %s' % tree)
         if commit:
             first_word = commit.split(' ', 1)[0]
             if first_word == 'Revert':
@@ -71,9 +73,9 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
     else:
         errors_stable = check_stable_branch_tags(dev_tag, release_tag, commit)
         errors_commit.update(errors_stable)
-    errors_stable_docs = check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug,
-                                                      travis_pull_request_number, travis_branch, travis_pr_slug)
-    errors_commit.update(errors_stable_docs)
+    # errors_stable_docs = check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug,
+    #                                                   travis_pull_request_number, travis_branch, travis_pr_slug)
+    # errors_commit.update(errors_stable_docs)
     if any(tag in REQUIREMENTS_TAGS_OF_VERSION for tag in list_tags):
         errors_version = check_version_tags(version_tags, list_tags, commit, version)
         errors_commit.update(errors_version)
