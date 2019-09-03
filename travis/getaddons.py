@@ -101,9 +101,8 @@ def get_versions_info(path, modules_pr, depth=1):
             print('changelog_path is {}'.format(changelog_path))
             if manifest_path:
                 if changelog_path:
-                    print('4')
                     # changelog = ast.literal_eval(open(changelog_path).read())
-                    changelog = os.path.isfile(os.path.join(changelog_path, 'changelog.rst'))
+                    changelog = os.path.isfile(changelog_path)
                     print('--changelog get_versions_info is \n{}'.format(changelog))
                 print('5')
                 manifest = ast.literal_eval(open(manifest_path).read())
