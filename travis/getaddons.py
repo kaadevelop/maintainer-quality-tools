@@ -48,7 +48,7 @@ def get_changelog_path(path):
     # print('--filtered-- get changelog is {}'.format(filtered))
     if len(files) == 2:
         return os.path.join(
-            path, next(files))
+            path, next(x for x in files))
     else:
         return False
 
@@ -95,11 +95,10 @@ def get_versions_info(path, modules_pr, depth=1):
         for module in listdir:
             if module not in modules_pr:
                 continue
-            print('1')
             manifest_path = is_module(os.path.join(path, module))
-            print('2')
+            print('manifest_path is {}'.format(manifest_path))
             changelog_path = get_changelog_path(os.path.join(path, module))
-            print('3')
+            print('changelog_path is {}'.format(changelog_path))
             if manifest_path:
                 if changelog_path:
                     print('4')
