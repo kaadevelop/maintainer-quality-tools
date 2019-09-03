@@ -43,9 +43,6 @@ def get_changelog_path(path):
     if not os.path.isdir(path):
         return False
     files = os.listdir(path)
-    print('--files-- get changelog is {}'.format(files))
-    # filtered = [x for x in files if x in (DOC_FILES)]
-    # print('--filtered-- get changelog is {}'.format(filtered))
     if len(files) == 2:
         return os.path.join(
             path, next(x for x in files))
@@ -107,7 +104,7 @@ def get_versions_info(path, modules_pr, depth=1):
                 if manifest.get('installable', True):
                     modules[module] = {
                         'version_from_manifest': manifest.get('version'),
-                        'version_from_changelog': version_from_changelog
+                        'version_from_changelog': version_from_changelog.rstrip()
                     }
             else:
                 deeper_modules = get_modules_info(
