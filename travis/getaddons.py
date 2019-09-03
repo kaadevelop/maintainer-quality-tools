@@ -110,10 +110,7 @@ def get_versions_info(path, modules_pr, depth=1):
             if changelog_path:
                 changelog = ast.literal_eval(open(changelog_path).read())
                 print('--changelog get_versions_info is \n{}'.format(changelog))
-            else:
-                deeper_modules = get_modules_info(
-                    os.path.join(path, module), depth-1)
-                modules.update(deeper_modules)
+
     return modules
 
 
