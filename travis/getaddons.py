@@ -97,10 +97,10 @@ def get_versions_info(path, modules_pr, depth=1):
                 continue
             manifest_path = is_module(os.path.join(path, module))
             changelog_path = get_changelog(os.path.join(path, module))
-            if changelog_path:
-                changelog = ast.literal_eval(open(changelog_path).read())
-                print('--changelog get_versions_info is \n{}'.format(changelog))
             if manifest_path:
+                if changelog_path:
+                    changelog = ast.literal_eval(open(changelog_path).read())
+                    print('--changelog get_versions_info is \n{}'.format(changelog))
                 manifest = ast.literal_eval(open(manifest_path).read())
                 if manifest.get('installable', True):
                     modules[module] = {
