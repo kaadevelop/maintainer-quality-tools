@@ -96,21 +96,19 @@ def get_versions_info(path, modules_pr, depth=1):
             if module not in modules_pr:
                 continue
             manifest_path = is_module(os.path.join(path, module))
-            print('manifest_path is {}'.format(manifest_path))
             changelog_path = get_changelog_path(os.path.join(path, module))
-            print('changelog_path is {}'.format(changelog_path))
             if manifest_path:
                 if changelog_path:
-                    # changelog = ast.literal_eval(open(changelog_path).read())
-                    # changelog = os.path.isfile(changelog_path)
+
                     with open(changelog_path) as f_changelog:
                         changelog = f_changelog.readlines()
-                    print('--changelog get_versions_info is \n{}'.format(changelog))
-                print('5')
+                    version_from_changelog = changelog[0]
+                    print('--version_from_changelog get_versions_info is \n{}'.format(version_from_changelog))
+                    modules[module] = {'version_from_changelog': version_from_changelog}
                 manifest = ast.literal_eval(open(manifest_path).read())
                 if manifest.get('installable', True):
                     modules[module] = {
-                        'version': manifest.get('version')
+                        'version_from_manifest': manifest.get('version')
                     }
             else:
                 deeper_modules = get_modules_info(
