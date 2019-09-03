@@ -14,7 +14,7 @@ VERSION_TAGS = [':zero:', ':one:', ':two:', ':three:', ':four:', ':five:', ':six
 REQUIREMENTS_TAGS_OF_VERSION = [':x:', ':arrow_up:', ':arrow_down:', ':tada:']
 
 
-def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis_branch, version, token, travis_build_dir):
+def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis_branch, version, token, travis_build_dir, travis_pr_slug):
     symbol_in_branch = re.search(r'-', str(travis_branch))
 
     #GET /repos/:owner/:repo/pulls/:pull_number/commits
@@ -39,12 +39,12 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             first_word = commit.split(' ', 1)[0]
             if first_word == 'Revert':
                 continue
-            errors_commit = handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch)
+            errors_commit = handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug)
             real_errors.update(errors_commit)
     return real_errors
 
 
-def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch):
+def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug):
     errors_commit = {}
     # looks tags starting at the beginning of the line and until first whitespace
     match_tags_commit = re.search(r'^(:[^\s]+:)', commit)
@@ -80,7 +80,7 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
     return errors_commit
 
 
-def check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch):
+def check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug):
     errors_stable_docs = {}
     modules_changed = get_modules_changed(travis_build_dir, travis_branch)
     print('-------------------------modules_changed:\n{}'.format(modules_changed))
