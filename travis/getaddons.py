@@ -48,7 +48,7 @@ def get_changelog_path(path):
     # print('--filtered-- get changelog is {}'.format(filtered))
     if len(files) == 2:
         return os.path.join(
-            path, next(x for x in files))
+            path, next(files))
     else:
         return False
 
