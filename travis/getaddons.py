@@ -102,8 +102,8 @@ def get_versions_info(path, modules_pr, depth=1):
             if manifest_path:
                 if changelog_path:
                     # changelog = ast.literal_eval(open(changelog_path).read())
-                    changelog = os.path.isfile(changelog_path)
-                    with open(changelog) as f_changelog:
+                    # changelog = os.path.isfile(changelog_path)
+                    with open(changelog_path) as f_changelog:
                         changelog = f_changelog.readlines()
                     print('--changelog get_versions_info is \n{}'.format(changelog))
                 print('5')
