@@ -36,7 +36,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         commit = commit.get('commit').get('message')
         # tree = commit.get('commit').get('tree')
         print('Commit: %s' % commit)
-        print('tree: %s' % tree)
+        # print('tree: %s' % tree)
         if commit:
             first_word = commit.split(' ', 1)[0]
             if first_word == 'Revert':
