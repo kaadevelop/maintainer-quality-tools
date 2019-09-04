@@ -24,10 +24,21 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         return real_errors
     # GET / repos /: owner /:repo / commits
     url_request = 'https://github.it-projects.info/repos/%s/pulls/%s/commits' % (str(travis_repo_slug), str(travis_pull_request_number))
+    url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (str(travis_repo_slug), str(travis_pull_request_number))
     resp = requests.get(url_request)
+    resp_files = requests.get(url_request_files)
     commits = resp.json()
+    files = resp_files.json()
     if resp.status_code != 200:
         print('GITHUB API response for commits: %s', [resp, resp.headers, commits])
+    if resp_files.status_code != 200:
+        print('GITHUB API response for files: %s', [resp_files, resp.headers, files])
+    files = {}
+    for file in files:
+        filename = file.get('filename')
+        if '__manifest__.py' or 'doc/changelog.rst' or 'doc/index.rst' in filename:
+            files.update({filename: file.get('raw_url')})
+    print('files of pr \n {}'.format(files))
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
