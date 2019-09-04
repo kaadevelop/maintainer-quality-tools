@@ -35,7 +35,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
                 # we don't check merge commits
                 continue
             commit = commit.get('commit').get('message')
-            tree = commit.get('commit').get('tree').get('url')
+            tree = commit.get('commit').get('tree')
             print('Commit: %s' % commit)
             print('tree: %s' % tree)
             if commit:
