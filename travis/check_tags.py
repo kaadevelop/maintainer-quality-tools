@@ -40,7 +40,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             if installable:
                 version = ast.literal_eval(html).get('version')
         elif 'doc/changelog.rst' in key:
-            version = html[0]
+            version = re.search(r'`(\d.\d.\d)`', html)
         print('file if {}\nhtml: \n{}'.format(key, version))
     for commit in commits:
         parents_commit = commit.get('parents')
