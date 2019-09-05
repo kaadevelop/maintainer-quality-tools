@@ -1,3 +1,4 @@
+import ast
 import re
 import requests
 
@@ -33,7 +34,14 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     for key, value in links_to_files_version.items():
         html = requests.get(value)
         html = html.text
-        print('file if {}\nhtml: \n{}'.format(key, html))
+        if '__manifest__.py' in key:
+            version = ''
+            installable = ast.literal_eval(html).get('installable', True)
+            if installable:
+                version = ast.literal_eval(html).get('version')
+        elif 'doc/changelog.rst' in key:
+            version = html[0]
+        print('file if {}\nhtml: \n{}'.format(key, version))
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
