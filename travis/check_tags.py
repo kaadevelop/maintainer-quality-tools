@@ -24,22 +24,16 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         return real_errors
     # GET / repos /: owner /:repo / commits
     url_request = 'https://github.it-projects.info/repos/%s/pulls/%s/commits' % (str(travis_repo_slug), str(travis_pull_request_number))
-    url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (str(travis_repo_slug), str(travis_pull_request_number))
     resp = requests.get(url_request)
-    resp_files = requests.get(url_request_files)
     commits = resp.json()
-    files = resp_files.json()
     if resp.status_code != 200:
         print('GITHUB API response for commits: %s', [resp, resp.headers, commits])
-    if resp_files.status_code != 200:
-        print('GITHUB API response for files: %s', [resp_files, resp.headers, files])
-    files_version = {}
-    for file in files:
-        filename = file.get('filename')
-        print('------filename is {}'.format(filename))
-        if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']):
-            files_version[filename] = file.get('raw_url')
-    print('files of pr \n {}'.format(files_version))
+    links_to_files_version = get_links_to_files_version(travis_repo_slug, travis_pull_request_number)
+    print('files of pr \n {}'.format(links_to_files_version))
+    for key, value in links_to_files_version.items():
+        html = requests.get(value)
+        html = html.text
+        print('file if {}\nhtml: \n{}'.format(key, html))
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
@@ -54,6 +48,21 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             errors_commit = handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug)
             real_errors.update(errors_commit)
     return real_errors
+
+
+def get_links_to_files_version(travis_repo_slug, travis_pull_request_number):
+    url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (
+    str(travis_repo_slug), str(travis_pull_request_number))
+    resp_files = requests.get(url_request_files)
+    files = resp_files.json()
+    if resp_files.status_code != 200:
+        print('GITHUB API response for files: %s', [resp_files, resp_files.headers, files])
+    links_to_files_version = {}
+    for file in files:
+        filename = file.get('filename')
+        if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']):
+            links_to_files_version[filename] = file.get('raw_url')
+    return links_to_files_version
 
 
 def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug):
