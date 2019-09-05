@@ -36,8 +36,8 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     files_version = {}
     for file in files:
         filename = file.get('filename')
-        if '__manifest__.py' or 'doc/changelog.rst' or 'doc/index.rst' in filename:
-            print(filename)
+        print('------filename is {}'.format(filename))
+        if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']):
             files_version[filename] = file.get('raw_url')
     print('files of pr \n {}'.format(files_version))
     for commit in commits:
