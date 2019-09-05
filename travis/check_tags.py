@@ -33,14 +33,14 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         print('GITHUB API response for commits: %s', [resp, resp.headers, commits])
     if resp_files.status_code != 200:
         print('GITHUB API response for files: %s', [resp_files, resp.headers, files])
-    files = {}
+    files_version = {}
     for file in files:
         filename = file.get('filename')
         print(filename)
         if '__manifest__.py' or 'doc/changelog.rst' or 'doc/index.rst' in filename:
             # files.update({filename: file.get('raw_url')})
-            files[filename] = file.get('raw_url')
-    print('files of pr \n {}'.format(files))
+            files_version[filename] = file.get('raw_url')
+    print('files of pr \n {}'.format(files_version))
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
