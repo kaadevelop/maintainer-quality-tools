@@ -76,7 +76,7 @@ def get_links_to_files_version(travis_repo_slug, travis_pull_request_number):
             links_to_files_version[filename] = file.get('raw_url')
     return links_to_files_version
 
-def get_patch_changed_file(travis_repo_slug, travis_pull_request_number):
+def get_versions_from_manifest(travis_repo_slug, travis_pull_request_number):
     # GET /repos/:owner/:repo/pulls/:pull_number/files
     url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (
     str(travis_repo_slug), str(travis_pull_request_number))
@@ -89,7 +89,11 @@ def get_patch_changed_file(travis_repo_slug, travis_pull_request_number):
         filename = file.get('filename')
         if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']):
             patch_changed_file[filename] = file.get('patch')
-    return patch_changed_file
+    versions_from_manifest = []
+    for key, value in patch_changed_file:
+        if '__manifest__.py' in key:
+            versions_from_manifest = re.findall(r'(\d+.\d.\d.\d.\d)\\', value)
+    return versions_from_manifest
 
 
 def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug):
@@ -121,7 +125,7 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
         errors_commit.update(errors_stable)
         errors_stable_docs = check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug,
                                                       travis_pull_request_number, travis_branch, travis_pr_slug)
-        errors_commit.update(errors_stable_docs)
+        # errors_commit.update(errors_stable_docs)
     if any(tag in REQUIREMENTS_TAGS_OF_VERSION for tag in list_tags):
         errors_version = check_version_tags(version_tags, list_tags, commit, version)
         errors_commit.update(errors_version)
@@ -131,8 +135,10 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
 def check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug,
                                                       travis_pull_request_number, travis_branch, travis_pr_slug):
     # See API Github: https://developer.github.com/v3/pulls/#list-pull-requests-files
-    patch_changed_file = get_patch_changed_file(travis_repo_slug, travis_pull_request_number)
-    print('patch_changed_file\n{}'.format(patch_changed_file))
+    versions_from_manifest = get_versions_from_manifest(travis_repo_slug, travis_pull_request_number)
+    print('versions_from_manifest\n{}'.format(versions_from_manifest))
+
+
     # links_to_files_version = get_links_to_files_version(travis_repo_slug, travis_pull_request_number)
     # print('files of pr \n {}'.format(links_to_files_version))
     # versions_from_pr_modules = get_versions_from_pr_modules(links_to_files_version)
