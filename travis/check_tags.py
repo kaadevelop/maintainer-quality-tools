@@ -31,18 +31,8 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         print('GITHUB API response for commits: %s', [resp, resp.headers, commits])
     links_to_files_version = get_links_to_files_version(travis_repo_slug, travis_pull_request_number)
     print('files of pr \n {}'.format(links_to_files_version))
-    for key, value in links_to_files_version.items():
-        html = requests.get(value)
-        html = html.text
-        if '__manifest__.py' in key:
-            version = ''
-            installable = ast.literal_eval(html).get('installable', True)
-            if installable:
-                version = ast.literal_eval(html).get('version')
-        elif 'doc/changelog.rst' in key:
-            version = re.search(r'`(\d.\d.\d)`', html)
-            version = version.group(1)
-        print('file is {}\nversion: {}'.format(key, version))
+    versions_from_pr_modules = get_versions_from_pr_modules(links_to_files_version)
+    print('versions_from_pr_modules:\n{}'.format(versions_from_pr_modules))
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
@@ -58,6 +48,22 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             real_errors.update(errors_commit)
     return real_errors
 
+
+def get_versions_from_pr_modules(links_to_files_version):
+    versions = {}
+    for key, value in links_to_files_version.items():
+        html = requests.get(value)
+        html = html.text
+        if '__manifest__.py' in key:
+            installable = ast.literal_eval(html).get('installable', True)
+            if installable:
+                version = ast.literal_eval(html).get('version')
+                versions.update({key: version})
+        elif 'doc/changelog.rst' in key:
+            version = re.search(r'`(\d.\d.\d)`', html)
+            version = version.group(1)
+            versions.update({key: version})
+    return versions
 
 def get_links_to_files_version(travis_repo_slug, travis_pull_request_number):
     url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (
