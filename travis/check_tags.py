@@ -37,7 +37,8 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     for file in files:
         filename = file.get('filename')
         if '__manifest__.py' or 'doc/changelog.rst' or 'doc/index.rst' in filename:
-            files.update({filename: file.get('raw_url')})
+            # files.update({filename: file.get('raw_url')})
+            files[filename] = file.get('raw_url')
     print('files of pr \n {}'.format(files))
     for commit in commits:
         parents_commit = commit.get('parents')
@@ -45,9 +46,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             # we don't check merge commits
             continue
         commit = commit.get('commit').get('message')
-        # tree = commit.get('commit').get('tree')
         print('Commit: %s' % commit)
-        # print('tree: %s' % tree)
         if commit:
             first_word = commit.split(' ', 1)[0]
             if first_word == 'Revert':
