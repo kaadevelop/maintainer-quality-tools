@@ -36,6 +36,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     files = {}
     for file in files:
         filename = file.get('filename')
+        print(filename)
         if '__manifest__.py' or 'doc/changelog.rst' or 'doc/index.rst' in filename:
             # files.update({filename: file.get('raw_url')})
             files[filename] = file.get('raw_url')
