@@ -90,13 +90,16 @@ def get_versions_from_manifest(travis_repo_slug, travis_pull_request_number):
         if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']):
             patch_changed_file[filename] = file.get('patch')
     print('patch_changed_file\n{}'.format(patch_changed_file))
-    versions_from_manifest = {}
-    for key, value in patch_changed_file:
+    versions_from_files = {}
+    for key, value in patch_changed_file.items():
         if '__manifest__.py' in key:
-            versions = re.findall(r'(\d+.\d.\d.\d.\d)\\', value)
+            versions = re.findall(r'(\d+.\d.\d.\d.\d)', value)
             print('versions {}'.format(versions))
-            versions_from_manifest[key] = versions
-    return versions_from_manifest
+            versions_from_files[key] = versions
+        if 'doc/changelog.rst' in key:
+            versions = re.findall(r'(\d+.\d.\d)', value)
+            versions_from_files[key] = versions
+    return versions_from_files
 
 
 def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug):
