@@ -89,12 +89,12 @@ def get_versions_from_manifest(travis_repo_slug, travis_pull_request_number):
         filename = file.get('filename')
         if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']):
             patch_changed_file[filename] = file.get('patch')
-    print('patch_changed_file\n{}'.format(patch_changed_file))
+    # print('patch_changed_file\n{}'.format(patch_changed_file))
     versions_from_files = {}
     for key, value in patch_changed_file.items():
         if '__manifest__.py' in key:
             versions = re.findall(r'(\d+.\d.\d.\d.\d)', value)
-            print('versions {}'.format(versions))
+            # print('versions {}'.format(versions))
             versions_from_files[key] = versions
         if 'doc/changelog.rst' in key:
             versions = re.findall(r'(\d+.\d.\d)', value)
