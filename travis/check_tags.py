@@ -140,9 +140,10 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
 
 def check_stable_branch_docs(release_tag, commit, travis_build_dir, travis_repo_slug,
                                                       travis_pull_request_number, travis_branch, travis_pr_slug):
-    # See API Github: https://developer.github.com/v3/pulls/#list-pull-requests-files
-    versions_from_manifest = get_versions_from_manifest(travis_repo_slug, travis_pull_request_number)
-    print('versions_from_manifest\n{}'.format(versions_from_manifest))
+    if any(tag in release_tag for tag in [':ambulance:', ':zap:', ':sparkles:']):
+        # See API Github: https://developer.github.com/v3/pulls/#list-pull-requests-files
+        versions_from_manifest = get_versions_from_manifest(travis_repo_slug, travis_pull_request_number)
+        print('versions_from_manifest\n{}'.format(versions_from_manifest))
 
 
     # links_to_files_version = get_links_to_files_version(travis_repo_slug, travis_pull_request_number)
