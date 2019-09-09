@@ -108,15 +108,13 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
         contents_url = file.get('contents_url')
         patch = file.get('patch')
         for commit, sha in commit_sha.items():
-            if sha in contents_url:
-                if '__manifest__.py' in filename:
-                    print('patch is {}'.format(patch))
-                    versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
-                    commit_patch_changed_file.update({commit: {filename: versions}})
-                if 'doc/changelog.rst' in filename:
-                    print('patch is {}'.format(patch))
-                    versions = re.findall(r'(\d+.\d.\d)', patch)
-                    commit_patch_changed_file.update({commit: {filename: versions}})
+            # if sha in contents_url:
+            if '__manifest__.py' in filename:
+                versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
+                commit_patch_changed_file.update({commit: {filename: versions}})
+            if 'doc/changelog.rst' in filename:
+                versions = re.findall(r'(\d+.\d.\d)', patch)
+                commit_patch_changed_file.update({commit: {filename: versions}})
     #     if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']) and sha in contents_url:
     #         commit_patch_changed_file.update({commit: {filename: file.get('patch')}})
     #         # patch_changed_file[filename] = file.get('patch')
