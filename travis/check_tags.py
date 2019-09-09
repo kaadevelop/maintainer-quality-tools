@@ -46,7 +46,6 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     print('commit_url\n{}'.format(commit_url))
     errors_stable_docs = check_stable_branch_docs(commit_url, travis_build_dir, travis_repo_slug,
                                                   travis_pull_request_number, travis_branch, travis_pr_slug)
-    print('errors_stable_docs: \n{}'.format(errors_stable_docs))
     return real_errors
 
 
@@ -99,6 +98,7 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
     # GET /repos/:owner/:repo/pulls/:pull_number/files
     # url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (
     # str(travis_repo_slug), str(travis_pull_request_number))
+    commit_patch_changed_file = {}
     for commit, url in commit_url.items():
         commit_content = requests.get(url)
         commit_content = commit_content.json()
@@ -106,7 +106,6 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
         #     print('GITHUB API response for files: %s', [commit_content, commit_content.headers, commit_content])
         commit_msg = commit_content.get('commit').get('message')
         files = commit_content.get('files')
-        commit_patch_changed_file = {}
         for file in files:
             filename = file.get('filename')
             patch = file.get('patch')
