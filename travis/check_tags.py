@@ -34,9 +34,9 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         if len(parents_commit) > 1:
             # we don't check merge commits
             continue
-        commit_url = commit.get('url')
+        url_commit = commit.get('url')
         commit = commit.get('commit').get('message')
-        commit_url.update({commit: commit_url})
+        commit_url.update({commit: url_commit})
         if commit:
             first_word = commit.split(' ', 1)[0]
             if first_word == 'Revert':
