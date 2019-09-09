@@ -34,9 +34,9 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         if len(parents_commit) > 1:
             # we don't check merge commits
             continue
-        commit = commit.get('commit').get('message')
         print('2')
         sha = commit.get('sha')
+        commit = commit.get('commit').get('message')
         print('3')
         print('Commit: %s' % commit)
         print('Sha: %s' % sha)
