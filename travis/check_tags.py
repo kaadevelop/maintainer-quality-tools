@@ -102,8 +102,8 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
     for commit, url in commit_url.items():
         commit_content = requests.get(url)
         commit_content = commit_content.json()
-        if commit_content.status_code != 200:
-            print('GITHUB API response for files: %s', [commit_content, commit_content.headers, commit_content])
+        # if commit_content.status_code != 200:
+        #     print('GITHUB API response for files: %s', [commit_content, commit_content.headers, commit_content])
         commit_msg = commit_content.get('commit').get('message')
         files = commit_content.get('files')
         commit_patch_changed_file = {}
