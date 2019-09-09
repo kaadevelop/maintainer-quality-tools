@@ -36,8 +36,6 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             continue
         sha = commit.get('sha')
         commit = commit.get('commit').get('message')
-        print('Commit: %s' % commit)
-        print('Sha: %s' % sha)
         commit_sha.update({commit: sha})
         if commit:
             first_word = commit.split(' ', 1)[0]
@@ -45,8 +43,10 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
                 continue
             errors_commit = handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug)
             real_errors.update(errors_commit)
+    print('commit_sha\n{}'.format(commit_sha))
     errors_stable_docs = check_stable_branch_docs(commit_sha, travis_build_dir, travis_repo_slug,
                                                   travis_pull_request_number, travis_branch, travis_pr_slug)
+    print('errors_stable_docs: \n{}'.format(errors_stable_docs))
     return real_errors
 
 
@@ -107,13 +107,14 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
         filename = file.get('filename')
         contents_url = file.get('contents_url')
         patch = file.get('patch')
-        for commit, sha in commit_sha.keys():
+        for commit, sha in commit_sha.items():
             if sha in contents_url:
                 if '__manifest__.py' in filename:
                     print('patch is {}'.format(patch))
                     versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
                     commit_patch_changed_file.update({commit: {filename: versions}})
                 if 'doc/changelog.rst' in filename:
+                    print('patch is {}'.format(patch))
                     versions = re.findall(r'(\d+.\d.\d)', patch)
                     commit_patch_changed_file.update({commit: {filename: versions}})
     #     if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']) and sha in contents_url:
