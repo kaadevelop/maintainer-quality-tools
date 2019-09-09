@@ -28,23 +28,23 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     commits = resp.json()
     if resp.status_code != 200:
         print('GITHUB API response for commits: %s', [resp, resp.headers, commits])
-    commit_sha = {}
+    commit_url = {}
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
             # we don't check merge commits
             continue
-        sha = commit.get('sha')
+        commit_url = commit.get('url')
         commit = commit.get('commit').get('message')
-        commit_sha.update({commit: sha})
+        commit_url.update({commit: commit_url})
         if commit:
             first_word = commit.split(' ', 1)[0]
             if first_word == 'Revert':
                 continue
             errors_commit = handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug)
             real_errors.update(errors_commit)
-    print('commit_sha\n{}'.format(commit_sha))
-    errors_stable_docs = check_stable_branch_docs(commit_sha, travis_build_dir, travis_repo_slug,
+    print('commit_url\n{}'.format(commit_url))
+    errors_stable_docs = check_stable_branch_docs(commit_url, travis_build_dir, travis_repo_slug,
                                                   travis_pull_request_number, travis_branch, travis_pr_slug)
     print('errors_stable_docs: \n{}'.format(errors_stable_docs))
     return real_errors
@@ -85,36 +85,37 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
     return errors_commit
 
 
-def check_stable_branch_docs(commit_sha, travis_build_dir, travis_repo_slug,
-                                                      travis_pull_request_number, travis_branch, travis_pr_slug):
+def check_stable_branch_docs(commit_url, travis_build_dir, travis_repo_slug,
+                             travis_pull_request_number, travis_branch, travis_pr_slug):
 
     # if any(tag in commit_sha.keys() for tag in [':ambulance:', ':zap:', ':sparkles:']):
         # See API Github: https://developer.github.com/v3/pulls/#list-pull-requests-files
-    versions_from_manifest = get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit_sha)
+    versions_from_manifest = get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit_url)
     print('versions_from_manifest\n{}'.format(versions_from_manifest))
+    return versions_from_manifest
 
 
-def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit_sha):
+def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit_url):
     # GET /repos/:owner/:repo/pulls/:pull_number/files
-    url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (
-    str(travis_repo_slug), str(travis_pull_request_number))
-    resp_files = requests.get(url_request_files)
-    files = resp_files.json()
-    if resp_files.status_code != 200:
-        print('GITHUB API response for files: %s', [resp_files, resp_files.headers, files])
-    commit_patch_changed_file = {}
-    for file in files:
-        filename = file.get('filename')
-        contents_url = file.get('contents_url')
-        patch = file.get('patch')
-        for commit, sha in commit_sha.items():
-            # if sha in contents_url:
+    # url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (
+    # str(travis_repo_slug), str(travis_pull_request_number))
+    for commit, url in commit_url.items():
+        commit_content = requests.get(url)
+        commit_content = commit_content.json()
+        if commit_content.status_code != 200:
+            print('GITHUB API response for files: %s', [commit_content, commit_content.headers, commit_content])
+        commit_msg = commit_content.get('commit').get('message')
+        files = commit_content.get('files')
+        commit_patch_changed_file = {}
+        for file in files:
+            filename = file.get('filename')
+            patch = file.get('patch')
             if '__manifest__.py' in filename:
                 versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
-                commit_patch_changed_file.update({commit: {filename: versions}})
+                commit_patch_changed_file.update({commit_msg: {filename: versions}})
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d.\d)', patch)
-                commit_patch_changed_file.update({commit: {filename: versions}})
+                commit_patch_changed_file.update({commit_msg: {filename: versions}})
     #     if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']) and sha in contents_url:
     #         commit_patch_changed_file.update({commit: {filename: file.get('patch')}})
     #         # patch_changed_file[filename] = file.get('patch')
