@@ -106,6 +106,7 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, sha, c
         patch = file.get('patch')
         if sha in contents_url:
             if '__manifest__.py' in filename:
+                print('patch is {}'.format(patch))
                 versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
                 commit_patch_changed_file.update({commit: {filename: versions}})
             if 'doc/changelog.rst' in filename:
