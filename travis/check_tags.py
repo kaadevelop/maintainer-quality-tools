@@ -106,11 +106,11 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
         if match_tags_commit not in tags:
             continue
         files = commit_content.get('files')
-
-        for file in files:
-            filename = file.get('filename')
-            patch = file.get('patch')
-            filename_patch.update({filename: patch})
+        print('files:\n {}'.format(files))
+        # for file in files:
+        #     filename = file.get('filename')
+        #     patch = file.get('patch')
+        #     filename_patch.update({filename: patch})
         filename_version = {}
     print('filename_patch:\n {}'.format(filename_patch))
     # for filename, patch in filename_patch:
