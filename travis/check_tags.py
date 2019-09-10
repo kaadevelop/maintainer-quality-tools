@@ -98,23 +98,23 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_version = {}
     filename_patch = {}
+    commit_filename_patch = {}
+    filename_version = {}
     for commit, url in commit_url.items():
         commit_content = requests.get(url)
         commit_content = commit_content.json()
-        print('commit_content\n{}'.format(commit_content))
         commit_msg = commit_content.get('commit').get('message')
         list_tags = re.findall(r'^(:[^\s]+:)', commit_msg)
-        print('list_tags is{}'.format(list_tags))
-        list_tags_commit = list(set(list_tags) & set(tags))
-        print('list_tags_commit is {}'.format(list_tags_commit))
-        # files = commit_content.get('files')
-        # print('files:\n {}'.format(files))
-        # for file in files:
-        #     filename = file.get('filename')
-        #     patch = file.get('patch')
-        #     filename_patch.update({filename: patch})
-        filename_version = {}
+        if list_tags == []:
+            continue
+        files = commit_content.get('files')
+        for file in files:
+            filename = file.get('filename')
+            patch = file.get('patch')
+            filename_patch.update({filename: patch})
+        commit_filename_patch = {commit_msg: filename_patch}
     print('filename_patch:\n {}'.format(filename_patch))
+    print('commit_filename_patch:\n {}'.format(commit_filename_patch))
     # for filename, patch in filename_patch:
     #     if '__manifest__.py' in filename:
     #         versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
