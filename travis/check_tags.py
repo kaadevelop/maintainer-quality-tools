@@ -113,6 +113,9 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
             filename = file.get('filename')
             patch = file.get('patch')
             filename_patch.update({filename: patch})
+        # if 'doc/changelog.rst' not in filename_patch.keys():
+        #     print("Error: Commit {}\nfile doc/changelog.rst doesn't updated".format(commit_msg))
+
         for filename, patch in filename_patch.items():
             if '__manifest__.py' in filename:
                 versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
@@ -121,7 +124,7 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
                 versions = re.findall(r'(\d+.\d.\d)', patch)
                 filename_version.update({filename: versions})
         commit_filename_version.update({commit_msg: filename_version})
-
+    print('filename_patch\n{}'.format(filename_patch))
     return commit_filename_version
 
 def check_version_tags(version_tags, list_tags, commit, version):
