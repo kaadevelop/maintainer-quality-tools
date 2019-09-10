@@ -101,13 +101,14 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
     for commit, url in commit_url.items():
         commit_content = requests.get(url)
         commit_content = commit_content.json()
+        print('commit_content\n{}'.format(commit_content))
         commit_msg = commit_content.get('commit').get('message')
         list_tags = re.findall(r'^(:[^\s]+:)', commit_msg)
         print('list_tags is{}'.format(list_tags))
         list_tags_commit = list(set(list_tags) & set(tags))
         print('list_tags_commit is {}'.format(list_tags_commit))
-        files = commit_content.get('files')
-        print('files:\n {}'.format(files))
+        # files = commit_content.get('files')
+        # print('files:\n {}'.format(files))
         # for file in files:
         #     filename = file.get('filename')
         #     patch = file.get('patch')
