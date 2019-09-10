@@ -98,7 +98,6 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_version = {}
     filename_patch = {}
-    commit_filename_patch = {}
     filename_version = {}
     for commit, url in commit_url.items():
         commit_content = requests.get(url)
@@ -113,8 +112,6 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
             filename = file.get('filename')
             patch = file.get('patch')
             filename_patch.update({filename: patch})
-        commit_filename_patch = {commit_msg: filename_patch}
-    for commit_msg, filename_patch in commit_filename_patch.items():
         for filename, patch in filename_patch.items():
             if '__manifest__.py' in filename:
                 versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
