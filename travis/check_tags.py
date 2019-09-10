@@ -109,16 +109,29 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
         if release_tag == []:
             continue
         files = commit_content.get('files')
+        updated_files_from_commit = [file.get('filename') for file in files]
+        if 'doc/changelog.rst' not in updated_files_from_commit:
+            print(f'ERROR! Commit: {commit_msg}\n "doc/changelog.rst" exist in updated files: {updated_files_from_commit}')
         for file in files:
             filename = file.get('filename')
             patch = file.get('patch')
             filename_patch.update({filename: patch})
+        for filename, patch in filename_patch.items():
             if '__manifest__.py' in filename:
                 versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
                 filename_version.update({filename: versions})
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d.\d)', patch)
                 filename_version.update({filename: versions})
+
+
+            # if '__manifest__.py' in filename:
+            #     versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
+            #     filename_version.update({filename: versions})
+            # if 'doc/changelog.rst' in filename:
+            #     versions = re.findall(r'(\d+.\d.\d)', patch)
+            #     filename_version.update({filename: versions})
+
         commit_filename_version.update({commit_msg: filename_version})
     print('filename_patch\n{}'.format(filename_patch))
     return commit_filename_version
