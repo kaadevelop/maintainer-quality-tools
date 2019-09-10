@@ -95,12 +95,12 @@ def check_stable_branch_docs(commit_url, travis_build_dir, travis_repo_slug,
 
 
 def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit_url):
-    print('commit_url is {}'.format(commit_url))
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_version = {}
     filename_patch = {}
     filename_version = {}
     for commit, url in commit_url.items():
+        url = url.replace('api.github.com', 'github.it-projects.info')
         commit_content = requests.get(url)
         commit_content = commit_content.json()
         commit_msg = commit_content.get('commit').get('message')
