@@ -95,36 +95,32 @@ def check_stable_branch_docs(commit_url, travis_build_dir, travis_repo_slug,
 
 
 def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit_url):
-    # GET /repos/:owner/:repo/pulls/:pull_number/files
-    # url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (
-    # str(travis_repo_slug), str(travis_pull_request_number))
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_version = {}
     filename_patch = {}
     for commit, url in commit_url.items():
         commit_content = requests.get(url)
         commit_content = commit_content.json()
-        # if commit_content.status_code != 200:
-        #     print('GITHUB API response for files: %s', [commit_content, commit_content.headers, commit_content])
         commit_msg = commit_content.get('commit').get('message')
         match_tags_commit = re.search(r'^(:[^\s]+:)', commit_msg)
         if match_tags_commit not in tags:
             continue
         files = commit_content.get('files')
-        filename_version = {}
+
         for file in files:
             filename = file.get('filename')
             patch = file.get('patch')
             filename_patch.update({filename: patch})
-        print('filename_patch:\n {}'.format(filename_patch))
-        for filename, patch in filename_patch:
-            if '__manifest__.py' in filename:
-                versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
-                filename_version.update({filename: versions})
-            if 'doc/changelog.rst' in filename:
-                versions = re.findall(r'(\d+.\d.\d)', patch)
-                filename_version.update({filename: versions})
-        commit_filename_version.update({commit_msg: filename_version})
+        filename_version = {}
+    print('filename_patch:\n {}'.format(filename_patch))
+    # for filename, patch in filename_patch:
+    #     if '__manifest__.py' in filename:
+    #         versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
+    #         filename_version.update({filename: versions})
+    #     if 'doc/changelog.rst' in filename:
+    #         versions = re.findall(r'(\d+.\d.\d)', patch)
+    #         filename_version.update({filename: versions})
+    # commit_filename_version.update({commit_msg: filename_version})
 
     return commit_filename_version
 
