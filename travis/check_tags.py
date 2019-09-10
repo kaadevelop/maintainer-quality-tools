@@ -111,7 +111,7 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
         files = commit_content.get('files')
         updated_files_from_commit = [file.get('filename') for file in files]
         if 'doc/changelog.rst' not in updated_files_from_commit:
-            print(f'ERROR! Commit: {commit_msg}\n "doc/changelog.rst" exist in updated files: {updated_files_from_commit}')
+            print('ERROR! Commit: {} "doc/changelog.rst" exist in updated files: {}'.format(commit_msg, updated_files_from_commit))
         for file in files:
             filename = file.get('filename')
             patch = file.get('patch')
