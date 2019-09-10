@@ -102,15 +102,16 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
         commit_content = requests.get(url)
         commit_content = commit_content.json()
         commit_msg = commit_content.get('commit').get('message')
-        match_tags_commit = re.search(r'^(:[^\s]+:)', commit_msg)
-        if match_tags_commit not in tags:
-            continue
+        list_tags = re.findall(r'^(:[^\s]+:)', commit_msg)
+        print('list_tags is{}'.format(list_tags))
+        list_tags_commit = list(set(list_tags) & set(tags))
+        print('list_tags_commit is {}'.format(list_tags_commit))
         files = commit_content.get('files')
         print('files:\n {}'.format(files))
-        # for file in files:
-        #     filename = file.get('filename')
-        #     patch = file.get('patch')
-        #     filename_patch.update({filename: patch})
+        for file in files:
+            filename = file.get('filename')
+            patch = file.get('patch')
+            filename_patch.update({filename: patch})
         filename_version = {}
     print('filename_patch:\n {}'.format(filename_patch))
     # for filename, patch in filename_patch:
