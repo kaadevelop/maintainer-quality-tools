@@ -95,6 +95,7 @@ def check_stable_branch_docs(commit_url, travis_build_dir, travis_repo_slug,
 
 
 def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit_url):
+    print('commit_url is {}'.format(commit_url))
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_version = {}
     filename_patch = {}
