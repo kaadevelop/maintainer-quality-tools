@@ -98,19 +98,26 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
     # GET /repos/:owner/:repo/pulls/:pull_number/files
     # url_request_files = 'https://github.it-projects.info/repos/%s/pulls/%s/files' % (
     # str(travis_repo_slug), str(travis_pull_request_number))
+    tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_version = {}
+    filename_patch = {}
     for commit, url in commit_url.items():
         commit_content = requests.get(url)
         commit_content = commit_content.json()
         # if commit_content.status_code != 200:
         #     print('GITHUB API response for files: %s', [commit_content, commit_content.headers, commit_content])
         commit_msg = commit_content.get('commit').get('message')
+        match_tags_commit = re.search(r'^(:[^\s]+:)', commit_msg)
+        if match_tags_commit not in tags:
+            continue
         files = commit_content.get('files')
-        print('files\n{}'.format(files))
         filename_version = {}
         for file in files:
             filename = file.get('filename')
             patch = file.get('patch')
+            filename_patch.update({filename: patch})
+        print('filename_patch:\n {}'.format(filename_patch))
+        for filename, patch in filename_patch:
             if '__manifest__.py' in filename:
                 versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
                 filename_version.update({filename: versions})
@@ -118,19 +125,7 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
                 versions = re.findall(r'(\d+.\d.\d)', patch)
                 filename_version.update({filename: versions})
         commit_filename_version.update({commit_msg: filename_version})
-    #     if any(x in filename for x in ['__manifest__.py', 'doc/changelog.rst', 'doc/index.rst']) and sha in contents_url:
-    #         commit_patch_changed_file.update({commit: {filename: file.get('patch')}})
-    #         # patch_changed_file[filename] = file.get('patch')
-    # # print('patch_changed_file\n{}'.format(patch_changed_file))
-    # versions_from_files = {}
-    # for key, value in commit_patch_changed_file.get(commit):
-    #     if '__manifest__.py' in key:
-    #         versions = re.findall(r'(\d+.\d.\d.\d.\d)', value)
-    #         # print('versions {}'.format(versions))
-    #         versions_from_files[key] = versions
-    #     if 'doc/changelog.rst' in key:
-    #         versions = re.findall(r'(\d+.\d.\d)', value)
-    #         versions_from_files[key] = versions
+
     return commit_filename_version
 
 def check_version_tags(version_tags, list_tags, commit, version):
