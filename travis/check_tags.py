@@ -99,6 +99,7 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
     commit_filename_version = {}
     filename_patch = {}
     filename_version = {}
+    commit_filename = {}
     for commit, url in commit_url.items():
         url = url.replace('api.github.com', 'github.it-projects.info')
         commit_content = requests.get(url)
@@ -115,14 +116,15 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
         for file in files:
             filename = file.get('filename')
             patch = file.get('patch')
-            filename_patch.update({filename: patch})
+            commit_filename[commit_msg] = filename
+            # filename_patch.update({filename: patch})
         # for filename, patch in filename_patch.items():
-            if '__manifest__.py' in filename:
-                versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
-                filename_version.update({filename: versions})
-            if 'doc/changelog.rst' in filename:
-                versions = re.findall(r'(\d+.\d.\d)', patch)
-                filename_version.update({filename: versions})
+        #     if '__manifest__.py' in filename:
+        #         versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
+        #         filename_version.update({filename: versions})
+        #     if 'doc/changelog.rst' in filename:
+        #         versions = re.findall(r'(\d+.\d.\d)', patch)
+        #         filename_version.update({filename: versions})
 
 
             # if '__manifest__.py' in filename:
@@ -132,9 +134,9 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
             #     versions = re.findall(r'(\d+.\d.\d)', patch)
             #     filename_version.update({filename: versions})
 
-        commit_filename_version.update({commit_msg: filename_version})
-    print('filename_patch\n{}'.format(filename_patch))
-    return commit_filename_version
+    #     commit_filename_version.update({commit_msg: filename_version})
+    # print('filename_patch\n{}'.format(filename_patch))
+    return commit_filename
 
 def check_version_tags(version_tags, list_tags, commit, version):
     errors_version = {}
