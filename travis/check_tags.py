@@ -116,7 +116,7 @@ def get_versions_from_files(travis_repo_slug, travis_pull_request_number, commit
             filename = file.get('filename')
             patch = file.get('patch')
             filename_patch.update({filename: patch})
-        for filename, patch in filename_patch.items():
+        # for filename, patch in filename_patch.items():
             if '__manifest__.py' in filename:
                 versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
                 filename_version.update({filename: versions})
