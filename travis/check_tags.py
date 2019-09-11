@@ -43,7 +43,6 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
                 continue
             errors_commit = handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug)
             real_errors.update(errors_commit)
-    print('commit_url\n{}'.format(commit_url))
     errors_stable_docs = check_stable_branch_docs(commit_url, travis_build_dir, travis_repo_slug,
                                                   travis_pull_request_number, travis_branch, travis_pr_slug)
     return real_errors
@@ -118,6 +117,10 @@ def get_changed_version(commit_url):
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d.\d)', patch)
                 filename_versions.update({filename: versions})
+            if 'doc/index.rst' in filename:
+                filename_versions.update({filename: 'Updated!'})
+            if 'README.rst' in filename:
+                filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
     return commit_filename_versions
 
