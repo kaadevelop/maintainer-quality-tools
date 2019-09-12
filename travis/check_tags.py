@@ -43,8 +43,8 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
                 continue
             errors_commit = handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug)
             real_errors.update(errors_commit)
-    errors_stable_docs = check_stable_branch_docs(commit_url, travis_build_dir, travis_repo_slug,
-                                                  travis_pull_request_number, travis_branch, travis_pr_slug)
+    error_version_docs = check_stable_branch_docs(commit_url)
+    real_errors.update(error_version_docs)
     return real_errors
 
 
@@ -83,15 +83,62 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
     return errors_commit
 
 
-def check_stable_branch_docs(commit_url, travis_build_dir, travis_repo_slug,
-                             travis_pull_request_number, travis_branch, travis_pr_slug):
+def check_stable_branch_docs(commit_url):
     error_version_docs = {}
-
-    # if any(tag in commit_sha.keys() for tag in [':ambulance:', ':zap:', ':sparkles:']):
-        # See API Github: https://developer.github.com/v3/pulls/#list-pull-requests-files
-    change_version = get_changed_version(commit_url)
-    print('change_version\n{}'.format(change_version))
+    commit_filename_versions = get_changed_version(commit_url)
+    error_changelog = check_changelog(commit_filename_versions)
+    error_version_docs.update(error_changelog)
     return error_version_docs
+
+
+def check_changelog(commit_filename_versions):
+    changelog = 'doc/changelog.rst'
+    error_changelog = {}
+    for commit_msg, filename_versions in commit_filename_versions.items():
+        list_changed_files = [filename for filename in filename_versions.keys()]
+        if changelog not in ''.join(list_changed_files):
+            error = {commit_msg: 'File "{}" not changed!'.format(changelog)}
+            error_changelog.update(error)
+            return error_changelog
+        for filename, versions in filename_versions.items():
+            if changelog not in filename:
+                continue
+            value_first_old, value_first_new = get_first_second_third_values(versions, first=True)
+            value_second_old, value_second_new = get_first_second_third_values(versions, second=True)
+            value_third_old, value_third_new = get_first_second_third_values(versions)
+            if ':sparkles:' in commit_msg:
+                if value_first_new - value_first_old == 1 and value_second_new == 0 and value_third_new == 0:
+                    continue
+                version_true = '{}.{}.{}'.format(value_first_old + 1, 0, 0)
+                error = {commit_msg: 'If you use tag :sparkles: version in file "{}" must will be change like {}'.format(
+                        filename, version_true)}
+                error_changelog.update(error)
+            if ':zap:' in commit_msg:
+                if value_second_new - value_second_old == 1 and value_third_new == 0:
+                    continue
+                version_true = '{}.{}.{}'.format(value_first_old, value_second_old + 1, 0)
+                error = {commit_msg: 'If you use tag :zap: version in file "{}" must will be change like {}'.format(
+                        filename, version_true)}
+                error_changelog.update(error)
+            if ':ambulance:' in commit_msg:
+                if value_third_new - value_third_old == 1:
+                    continue
+                version_true = '{}.{}.{}'.format(value_first_old, value_second_old, value_third_old + 1)
+                error = {commit_msg: 'If you use tag :ambulance: version in file "{}" must will be change like {}'.format(
+                        filename, version_true)}
+                error_changelog.update(error)
+    return error_changelog
+
+
+def get_first_second_third_values(versions, first=False, second=False):
+    if first:
+        match = r'^(\d).'
+    elif second:
+        match = r'^\d.(\d).'
+    else:
+        match = r'^\d.\d.(\d)'
+    values = [int((re.search(match, value)).group(1)) for value in versions]
+    return values
 
 
 def get_changed_version(commit_url):
