@@ -99,7 +99,8 @@ def check_changelog(commit_filename_versions):
         if changelog not in ''.join(list_changed_files):
             error = {commit_msg: 'File "{}" not changed!'.format(changelog)}
             error_changelog.update(error)
-            return error_changelog
+            # return error_changelog
+            continue
         for filename, versions in filename_versions.items():
             if changelog not in filename:
                 continue
