@@ -94,6 +94,7 @@ def check_stable_branch_docs(commit_url):
 def check_changelog(commit_filename_versions):
     changelog = 'doc/changelog.rst'
     error_changelog = {}
+    error_msg = 'If you use tag {} the version in the "{}" file must be changed to {}'
     for commit_msg, filename_versions in commit_filename_versions.items():
         list_changed_files = [filename for filename in filename_versions.keys()]
         if changelog not in ''.join(list_changed_files):
@@ -111,22 +112,19 @@ def check_changelog(commit_filename_versions):
                 if value_first_new - value_first_old == 1 and value_second_new == 0 and value_third_new == 0:
                     continue
                 version_true = '{}.{}.{}'.format(value_first_old + 1, 0, 0)
-                error = {commit_msg: 'If you use tag :sparkles: version in file "{}" must will be change like {}'.format(
-                        filename, version_true)}
+                error = {commit_msg: '{}'.format(error_msg).format(':sparkles:', filename, version_true)}
                 error_changelog.update(error)
             if ':zap:' in commit_msg:
                 if value_second_new - value_second_old == 1 and value_third_new == 0:
                     continue
                 version_true = '{}.{}.{}'.format(value_first_old, value_second_old + 1, 0)
-                error = {commit_msg: 'If you use tag :zap: version in file "{}" must will be change like {}'.format(
-                        filename, version_true)}
+                error = {commit_msg: '{}'.format(error_msg).format(':zap:', filename, version_true)}
                 error_changelog.update(error)
             if ':ambulance:' in commit_msg:
                 if value_third_new - value_third_old == 1:
                     continue
                 version_true = '{}.{}.{}'.format(value_first_old, value_second_old, value_third_old + 1)
-                error = {commit_msg: 'If you use tag :ambulance: version in file "{}" must will be change like {}'.format(
-                        filename, version_true)}
+                error = {commit_msg: '{}'.format(error_msg).format(':ambulance:', filename, version_true)}
                 error_changelog.update(error)
     return error_changelog
 
