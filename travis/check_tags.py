@@ -93,15 +93,26 @@ def check_stable_branch_docs(commit_url):
 
 def check_changelog(commit_filename_versions):
     changelog = 'doc/changelog.rst'
+    readme = 'README.rst'
+    index = 'doc/index.rst'
     error_changelog = {}
     error_msg = 'If you use tag {} the version in the "{}" file must be changed to {}'
     for commit_msg, filename_versions in commit_filename_versions.items():
         list_changed_files = [filename for filename in filename_versions.keys()]
+        str_change_files = ''.join(list_changed_files)
         if changelog not in ''.join(list_changed_files):
             error = {commit_msg: 'File "{}" not changed!'.format(changelog)}
             error_changelog.update(error)
             # return error_changelog
-            continue
+        if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
+            if readme not in str_change_files:
+                error = {commit_msg: 'File "{}" not changed!'.format(readme)}
+                error_changelog.update(error)
+                # return error_changelog
+            if index not in str_change_files:
+                error = {commit_msg: 'File "{}" not changed!'.format(index)}
+                error_changelog.update(error)
+                # return error_changelog
         for filename, versions in filename_versions.items():
             if changelog not in filename:
                 continue
