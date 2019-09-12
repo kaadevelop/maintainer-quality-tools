@@ -104,15 +104,18 @@ def check_changelog(commit_filename_versions):
             error = {commit_msg: 'File "{}" not changed!'.format(changelog)}
             error_changelog.update(error)
             # return error_changelog
+            continue
         if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
             if readme not in str_change_files:
                 error = {commit_msg: 'File "{}" not changed!'.format(readme)}
                 error_changelog.update(error)
                 # return error_changelog
+                continue
             if index not in str_change_files:
                 error = {commit_msg: 'File "{}" not changed!'.format(index)}
                 error_changelog.update(error)
                 # return error_changelog
+                continue
         for filename, versions in filename_versions.items():
             if changelog not in filename:
                 continue
