@@ -20,7 +20,7 @@ result = check_tags.get_errors_msgs_commits(travis_repo_slug, travis_pull_reques
 count_errors = len(result.keys())
 if count_errors > 0:
     for key, value in result.items():
-        print('Wrong commit:')
+        print('Wrong commit or changed of file:')
         print(travis_helpers.yellow("{commit}".format(commit=key)))
         print(travis_helpers.red("{errors}".format(errors=value)))
         print(error_msg)

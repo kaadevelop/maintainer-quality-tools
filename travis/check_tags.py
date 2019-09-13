@@ -86,15 +86,15 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
 def check_stable_branch_docs(commit_url):
     error_version_docs = {}
     commit_filename_versions = get_changed_version(commit_url)
-    error_changelog_index_readme = check_changelog(commit_filename_versions)
+    error_changelog_index_readme = check_changelog_index_readme(commit_filename_versions)
     error_version_docs.update(error_changelog_index_readme)
     return error_version_docs
 
 
-def check_changelog(commit_filename_versions):
+def check_changelog_index_readme(commit_filename_versions):
     changelog = 'doc/changelog.rst'
     error_changelog_index_readme = {}
-    error_version_msg = 'If you use tag {} the version in the "{}" file must be changed to {}'
+    error_version_msg = 'If you use tag {} the version in the "{}" file must be changed to {}!'
 
     for commit_msg, filename_versions in commit_filename_versions.items():
         list_changed_files = [filename for filename in filename_versions.keys()]
@@ -130,10 +130,8 @@ def check_changelog(commit_filename_versions):
 def get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog):
     error_change_changelog_index_readme = {}
     str_change_files = ''.join(list_changed_files)
-    readme = 'README.rst'
-    index = 'doc/index.rst'
     list_readme_index = ['README.rst', 'doc/index.rst']
-    error_change_msg = 'If you use once of tags {} file(s) {} must be changed'
+    error_change_msg = 'If you use once of tags {} file(s) {} must be changed!'
     if changelog not in str_change_files:
         error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:", ":ambulance:"', changelog)}
         error_change_changelog_index_readme.update(error)
@@ -143,12 +141,6 @@ def get_change_changelog_index_readme_file(commit_msg, list_changed_files, chang
                 continue
             error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', list_readme_index)}
             error_change_changelog_index_readme.update(error)
-        # if readme not in str_change_files:
-        #     error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', readme)}
-        #     error_change_changelog_index_readme.update(error)
-        # if index not in str_change_files:
-        #     error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', index)}
-        #     error_change_changelog_index_readme.update(error)
     return error_change_changelog_index_readme
 
 
