@@ -93,7 +93,6 @@ def check_stable_branch_docs(commit_url):
 
 def check_changelog(commit_filename_versions):
     changelog = 'doc/changelog.rst'
-
     error_changelog_index_readme = {}
     error_version_msg = 'If you use tag {} the version in the "{}" file must be changed to {}'
 
@@ -133,17 +132,23 @@ def get_change_changelog_index_readme_file(commit_msg, list_changed_files, chang
     str_change_files = ''.join(list_changed_files)
     readme = 'README.rst'
     index = 'doc/index.rst'
-    error_change_msg = 'If you use once of tags {} file {} must be changed'
-    if changelog not in ''.join(list_changed_files):
+    list_readme_index = ['README.rst', 'doc/index.rst']
+    error_change_msg = 'If you use once of tags {} file(s) {} must be changed'
+    if changelog not in str_change_files:
         error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:", ":ambulance:"', changelog)}
         error_change_changelog_index_readme.update(error)
     if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
-        if readme not in str_change_files:
-            error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', readme)}
+        for file in list_readme_index:
+            if file in str_change_files:
+                continue
+            error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', list_readme_index)}
             error_change_changelog_index_readme.update(error)
-        if index not in str_change_files:
-            error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', index)}
-            error_change_changelog_index_readme.update(error)
+        # if readme not in str_change_files:
+        #     error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', readme)}
+        #     error_change_changelog_index_readme.update(error)
+        # if index not in str_change_files:
+        #     error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', index)}
+        #     error_change_changelog_index_readme.update(error)
     return error_change_changelog_index_readme
 
 
