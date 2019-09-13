@@ -13,7 +13,6 @@ travis_repo_slug = os.environ.get('TRAVIS_REPO_SLUG')
 travis_pr_slug = os.environ.get('TRAVIS_PULL_REQUEST_SLUG')
 travis_branch = os.environ.get('TRAVIS_BRANCH')
 travis_build_dir = os.environ.get('TRAVIS_BUILD_DIR')
-print('-------------------------travis_build_dir: {}'.format(travis_build_dir))
 error_msg = "Check guidelines: https://gitlab.com/itpp/handbook/blob/master/documenting-updates.md If you are not IT-Projects' employee, you can ignore it and we'll handle it by our own"
 exit_status = 0
 result = check_tags.get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis_branch, version, token, travis_build_dir, travis_pr_slug)
