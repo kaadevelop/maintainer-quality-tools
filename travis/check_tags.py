@@ -99,17 +99,18 @@ def check_changelog_manifest_index_readme(commit_filename_versions):
 
     for commit_msg, filename_versions in commit_filename_versions.items():
         list_changed_files = [filename for filename in filename_versions.keys()]
-        error_change_changelog_manifest_index_readme = get_change_changelog_manifest_index_readme_file(commit_msg, list_changed_files, changelog)
-        error_changelog_manifest_index_readme.update(error_change_changelog_manifest_index_readme)
+        error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog)
+        error_changelog_manifest_index_readme.update(error_change_changelog_index_readme)
         error_manifest_changelog = {}
         for filename, versions in filename_versions.items():
-            if changelog in filename:
-                error_changelog = check_changelog_version(error_version_msg, filename, commit_msg, versions)
-                error_manifest_changelog.update(error_changelog)
+            if changelog not in filename:
+                continue
+            error_changelog = check_changelog_version(error_version_msg, filename, commit_msg, versions)
+            error_manifest_changelog.update(error_changelog)
             # if manifest in filename:
             #     error_manifest = check_manifest_version(error_version_msg, filename, commit_msg, versions)
             #     error_manifest_changelog.update(error_manifest)
-            error_changelog_manifest_index_readme.update(error_manifest_changelog)
+        error_changelog_manifest_index_readme.update(error_manifest_changelog)
     return error_changelog_manifest_index_readme
 
 
@@ -161,7 +162,7 @@ def check_changelog_version(error_version_msg, filename, commit_msg, versions):
     return error_changelog
 
 
-def get_change_changelog_manifest_index_readme_file(commit_msg, list_changed_files, changelog):
+def get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog):
     error_change_changelog_manifest_index_readme = {}
     str_change_files = ''.join(list_changed_files)
     list_readme_index = ['README.rst', 'doc/index.rst']
