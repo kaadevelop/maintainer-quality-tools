@@ -99,7 +99,7 @@ def check_changelog_manifest_index_readme(commit_filename_versions):
 
     for commit_msg, filename_versions in commit_filename_versions.items():
         list_changed_files = [filename for filename in filename_versions.keys()]
-        error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog)
+        error_change_changelog_index_readme = get_change_changelog_manifest_index_readme_file(commit_msg, list_changed_files, changelog, manifest)
         error_changelog_manifest_index_readme.update(error_change_changelog_index_readme)
         error_manifest_changelog = {}
         for filename, versions in filename_versions.items():
@@ -184,13 +184,16 @@ def check_changelog_version(error_version_msg, filename, commit_msg, versions):
     return error_changelog
 
 
-def get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog):
+def get_change_changelog_manifest_index_readme_file(commit_msg, list_changed_files, changelog, manifest):
     error_change_changelog_index_readme = {}
     str_change_files = ''.join(list_changed_files)
     list_readme_index = ['README.rst', 'doc/index.rst']
     error_change_msg = 'If you use once of tags {} - file(s) {} must be changed!'
     if changelog not in str_change_files:
         error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:", ":ambulance:"', changelog)}
+        error_change_changelog_index_readme.update(error)
+    if manifest not in str_change_files:
+        error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:", ":ambulance:"', manifest)}
         error_change_changelog_index_readme.update(error)
     if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
         for file in list_readme_index:
