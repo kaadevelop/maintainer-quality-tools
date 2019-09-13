@@ -86,31 +86,21 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
 def check_stable_branch_docs(commit_url):
     error_version_docs = {}
     commit_filename_versions = get_changed_version(commit_url)
-    error_changelog = check_changelog(commit_filename_versions)
-    error_version_docs.update(error_changelog)
+    error_changelog_index_readme = check_changelog(commit_filename_versions)
+    error_version_docs.update(error_changelog_index_readme)
     return error_version_docs
 
 
 def check_changelog(commit_filename_versions):
     changelog = 'doc/changelog.rst'
-    readme = 'README.rst'
-    index = 'doc/index.rst'
-    error_changelog = {}
+
+    error_changelog_index_readme = {}
     error_version_msg = 'If you use tag {} the version in the "{}" file must be changed to {}'
-    error_change_msg = 'If you use once of tags {} file {} must be changed'
+
     for commit_msg, filename_versions in commit_filename_versions.items():
         list_changed_files = [filename for filename in filename_versions.keys()]
-        str_change_files = ''.join(list_changed_files)
-        if changelog not in ''.join(list_changed_files):
-            error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:", ":ambulance:"', changelog)}
-            error_changelog.update(error)
-        if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
-            if readme not in str_change_files:
-                error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', readme)}
-                error_changelog.update(error)
-            if index not in str_change_files:
-                error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', index)}
-                error_changelog.update(error)
+        error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog)
+        error_changelog_index_readme.update(error_change_changelog_index_readme)
         for filename, versions in filename_versions.items():
             if changelog not in filename:
                 continue
@@ -122,20 +112,39 @@ def check_changelog(commit_filename_versions):
                     continue
                 version_true = '{}.{}.{}'.format(value_first_old + 1, 0, 0)
                 error = {commit_msg: '{}'.format(error_version_msg).format(':sparkles:', filename, version_true)}
-                error_changelog.update(error)
+                error_changelog_index_readme.update(error)
             if ':zap:' in commit_msg:
                 if value_second_new - value_second_old == 1 and value_third_new == 0:
                     continue
                 version_true = '{}.{}.{}'.format(value_first_old, value_second_old + 1, 0)
                 error = {commit_msg: '{}'.format(error_version_msg).format(':zap:', filename, version_true)}
-                error_changelog.update(error)
+                error_changelog_index_readme.update(error)
             if ':ambulance:' in commit_msg:
                 if value_third_new - value_third_old == 1:
                     continue
                 version_true = '{}.{}.{}'.format(value_first_old, value_second_old, value_third_old + 1)
                 error = {commit_msg: '{}'.format(error_version_msg).format(':ambulance:', filename, version_true)}
-                error_changelog.update(error)
-    return error_changelog
+                error_changelog_index_readme.update(error)
+    return error_changelog_index_readme
+
+
+def get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog):
+    error_change_changelog_index_readme = {}
+    str_change_files = ''.join(list_changed_files)
+    readme = 'README.rst'
+    index = 'doc/index.rst'
+    error_change_msg = 'If you use once of tags {} file {} must be changed'
+    if changelog not in ''.join(list_changed_files):
+        error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:", ":ambulance:"', changelog)}
+        error_change_changelog_index_readme.update(error)
+    if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
+        if readme not in str_change_files:
+            error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', readme)}
+            error_change_changelog_index_readme.update(error)
+        if index not in str_change_files:
+            error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', index)}
+            error_change_changelog_index_readme.update(error)
+    return error_change_changelog_index_readme
 
 
 def get_first_second_third_values(versions, first=False, second=False):
