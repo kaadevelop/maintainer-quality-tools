@@ -100,7 +100,7 @@ def check_changelog_manifest_index_readme(commit_filename_versions):
     for commit_msg, filename_versions in commit_filename_versions.items():
         list_changed_files = [filename for filename in filename_versions.keys()]
         error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog)
-        print('error_change_changelog_index_readme\n{}'.format(error_change_changelog_index_readme))
+        # print('error_change_changelog_index_readme\n{}'.format(error_change_changelog_index_readme))
         error_changelog_manifest_index_readme.update(error_change_changelog_index_readme)
         error_manifest_changelog = {}
         for filename, versions in filename_versions.items():
@@ -164,23 +164,25 @@ def check_changelog_version(error_version_msg, filename, commit_msg, versions):
 
 
 def get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog):
-    print('list_changed_files\n{}'.format(list_changed_files))
     error_change_changelog_manifest_index_readme = {}
     str_change_files = ''.join(list_changed_files)
     list_readme_index = ['README.rst', 'doc/index.rst']
     error_change_msg = 'If you use once of tags {} - file(s) {} must be changed!'
+    i = 1
     if changelog not in str_change_files:
-        error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:", ":ambulance:"', changelog)}
+        i += 1
+        error = {'{} {}'.format(i, commit_msg): '{}'.format(error_change_msg).format(':sparkles:, :zap: or :ambulance:', changelog)}
         error_change_changelog_manifest_index_readme.update(error)
     if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
         error_index_redme = {}
         for file in list_readme_index:
             if file in str_change_files:
                 continue
-            error = {commit_msg: '{}'.format(error_change_msg).format('":sparkles:", ":zap:"', list_readme_index)}
+            i += 1
+            error = {'{} {}'.format(i, commit_msg): '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' and '.join(list_readme_index))}
             error_index_redme.update(error)
-        print('error_index_redme\n{}'.format(error_index_redme))
         error_change_changelog_manifest_index_readme.update(error_index_redme)
+    print('error_change_changelog_manifest_index_readme\n{}'.format(error_change_changelog_manifest_index_readme))
     return error_change_changelog_manifest_index_readme
 
 
