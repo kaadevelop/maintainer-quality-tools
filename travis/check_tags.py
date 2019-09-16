@@ -75,8 +75,6 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
     else:
         errors_stable = check_stable_branch_tags(dev_tag, release_tag, commit)
         errors_commit.update(errors_stable)
-
-        # errors_commit.update(errors_stable_docs)
     if any(tag in REQUIREMENTS_TAGS_OF_VERSION for tag in list_tags):
         errors_version = check_version_tags(version_tags, list_tags, commit, version)
         errors_commit.update(errors_version)
