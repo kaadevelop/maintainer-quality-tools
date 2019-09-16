@@ -95,24 +95,18 @@ def check_changelog_manifest_index_readme(commit_filename_versions):
     changelog = 'doc/changelog.rst'
     manifest = '__manifest__.py'
     error_changelog_manifest_index_readme = {}
-
     i = 0
     for commit_msg, filename_versions in commit_filename_versions.items():
         i += 1
         list_changed_files = [filename for filename in filename_versions.keys()]
         error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog, i)
-        # print('error_change_changelog_index_readme\n{}'.format(error_change_changelog_index_readme))
         error_changelog_manifest_index_readme.update(error_change_changelog_index_readme)
         error_manifest_changelog = {}
         for filename, versions in filename_versions.items():
             if changelog not in filename:
                 continue
             error_changelog = check_changelog_version(filename, commit_msg, versions, i)
-            print('error_changelog\n{}'.format(error_changelog))
             error_manifest_changelog.update(error_changelog)
-            # if manifest in filename:
-            #     error_manifest = check_manifest_version(error_version_msg, filename, commit_msg, versions)
-            #     error_manifest_changelog.update(error_manifest)
         error_changelog_manifest_index_readme.update(error_manifest_changelog)
     return error_changelog_manifest_index_readme
 
@@ -143,7 +137,8 @@ def check_changelog_manifest_index_readme(commit_filename_versions):
 
 
 def check_changelog_version(filename, commit_msg, versions, i):
-    error_version_msg = 'If you use tag {} the version in the "{}" file must be changed to {}!'
+    error_version_msg_value = 'If you use tag {} the version in the "{}" file must be changed to {}!'
+    error_version_msg_key = '{} commit: {}\nold version is {} and new version is {}'
     error_changelog = {}
     value_first_old, value_first_new = get_first_second_third_values(versions, first=True)
     value_second_old, value_second_new = get_first_second_third_values(versions, second=True)
@@ -151,17 +146,20 @@ def check_changelog_version(filename, commit_msg, versions, i):
     if ':sparkles:' in commit_msg:
         if value_first_new - value_first_old != 1 and value_second_new != 0 and value_third_new != 0:
             version_true = '{}.{}.{}'.format(value_first_old + 1, 0, 0)
-            error = {'{} commit: {}\nold version is {}, new version is {}'.format(i, commit_msg, versions[0], versions[1]): '{}'.format(error_version_msg).format(':sparkles:', filename, version_true)}
+            error = {'{}'.format(error_version_msg_key).format(i, commit_msg, versions[0], versions[1]):
+                         '{}'.format(error_version_msg_value).format(':sparkles:', filename, version_true)}
             error_changelog.update(error)
     if ':zap:' in commit_msg:
         if value_second_new - value_second_old != 1 and value_third_new != 0:
             version_true = '{}.{}.{}'.format(value_first_old, value_second_old + 1, 0)
-            error = {'{} commit: {}\nold version is {}, new version is {}'.format(i, commit_msg, versions[0], versions[1]): '{}'.format(error_version_msg).format(':zap:', filename, version_true)}
+            error = {'{}'.format(error_version_msg_key).format(i, commit_msg, versions[0], versions[1]):
+                         '{}'.format(error_version_msg_value).format(':zap:', filename, version_true)}
             error_changelog.update(error)
     if ':ambulance:' in commit_msg:
         if value_third_new - value_third_old != 1:
             version_true = '{}.{}.{}'.format(value_first_old, value_second_old, value_third_old + 1)
-            error = {'{} commit: {}\nold version is {}, new version is {}'.format(i, commit_msg, versions[0], versions[1]): '{}'.format(error_version_msg).format(':ambulance:', filename, version_true)}
+            error = {'{}'.format(error_version_msg_key).format(i, commit_msg, versions[0], versions[1]):
+                         '{}'.format(error_version_msg_value).format(':ambulance:', filename, version_true)}
             error_changelog.update(error)
     return error_changelog
 
@@ -172,14 +170,16 @@ def get_change_changelog_index_readme_file(commit_msg, list_changed_files, chang
     list_readme_index = ['README.rst', 'doc/index.rst']
     error_change_msg = 'If you use one of the tags {} - file(s) {} must be changed!'
     if changelog not in str_change_files:
-        error = {'{} commit: {}\nupdated files: {}\nnot updated file: {}'.format(i, commit_msg, str_change_files, changelog): '{}'.format(error_change_msg).format(':sparkles:, :zap: or :ambulance:', changelog)}
+        error = {'{} commit: {}\nupdated files: {}\nnot updated file: {}'.format(i, commit_msg, str_change_files, changelog):
+                '{}'.format(error_change_msg).format(':sparkles:, :zap: or :ambulance:', changelog)}
         error_change_changelog_manifest_index_readme.update(error)
     if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
         error_index_redme = {}
         for file in list_readme_index:
             if file in str_change_files:
                 continue
-            error = {'{} commit: {}\nupdated files: {}\nnot updated file: {}'.format(i, commit_msg, str_change_files, file): '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' and '.join(list_readme_index))}
+            error = {'{} commit: {}\nupdated files: {}\nnot updated file: {}'.format(i, commit_msg, str_change_files, file):
+                    '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' and '.join(list_readme_index))}
             error_index_redme.update(error)
         error_change_changelog_manifest_index_readme.update(error_index_redme)
     return error_change_changelog_manifest_index_readme
