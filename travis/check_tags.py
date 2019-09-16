@@ -178,7 +178,7 @@ def get_change_changelog_index_readme_file(commit_msg, list_changed_files, chang
         for file in list_readme_index:
             if file in str_change_files:
                 continue
-            i += 1
+            i += 1.1
             error = {'{} {}'.format(i, commit_msg): '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' and '.join(list_readme_index))}
             error_index_redme.update(error)
         error_change_changelog_manifest_index_readme.update(error_index_redme)
