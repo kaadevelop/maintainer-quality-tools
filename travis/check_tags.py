@@ -171,7 +171,7 @@ def get_change_changelog_index_readme_file(commit_msg, list_changed_files, chang
     error_change_msg = 'If you use once of tags {} - file(s) {} must be changed!'
 
     if changelog not in str_change_files:
-        error = {'{} commit: {}\nchanged files: {}'.format(i, commit_msg, str_change_files): '{}'.format(error_change_msg).format(':sparkles:, :zap: or :ambulance:', changelog)}
+        error = {'{} commit: {}\nchanged files: {}\nnot changed file: {}'.format(i, commit_msg, str_change_files, changelog): '{}'.format(error_change_msg).format(':sparkles:, :zap: or :ambulance:', changelog)}
         error_change_changelog_manifest_index_readme.update(error)
 
     if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
@@ -179,8 +179,7 @@ def get_change_changelog_index_readme_file(commit_msg, list_changed_files, chang
         for file in list_readme_index:
             if file in str_change_files:
                 continue
-            i += 0.1
-            error = {'{} commit: {}\nnot changed file: {}'.format(i, commit_msg, file): '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' and '.join(list_readme_index))}
+            error = {'{} commit: {}\nchanged files: {}\nnot changed file: {}'.format(i, commit_msg, str_change_files, file): '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' and '.join(list_readme_index))}
             error_index_redme.update(error)
 
         error_change_changelog_manifest_index_readme.update(error_index_redme)
