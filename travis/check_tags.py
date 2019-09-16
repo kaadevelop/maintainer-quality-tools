@@ -96,10 +96,11 @@ def check_changelog_manifest_index_readme(commit_filename_versions):
     manifest = '__manifest__.py'
     error_changelog_manifest_index_readme = {}
     error_version_msg = 'If you use tag {} the version in the "{}" file must be changed to {}!'
-
+    i = 0
     for commit_msg, filename_versions in commit_filename_versions.items():
+        i += 1
         list_changed_files = [filename for filename in filename_versions.keys()]
-        error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog)
+        error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog, i)
         # print('error_change_changelog_index_readme\n{}'.format(error_change_changelog_index_readme))
         error_changelog_manifest_index_readme.update(error_change_changelog_index_readme)
         error_manifest_changelog = {}
@@ -163,24 +164,25 @@ def check_changelog_version(error_version_msg, filename, commit_msg, versions):
     return error_changelog
 
 
-def get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog):
+def get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog, i):
     error_change_changelog_manifest_index_readme = {}
-    str_change_files = ''.join(list_changed_files)
+    str_change_files = ', '.join(list_changed_files)
     list_readme_index = ['README.rst', 'doc/index.rst']
     error_change_msg = 'If you use once of tags {} - file(s) {} must be changed!'
-    i = 1
+
     if changelog not in str_change_files:
-        error = {'{} commit - {}'.format(i, commit_msg): '{}'.format(error_change_msg).format(':sparkles:, :zap: or :ambulance:', changelog)}
+        error = {'{} commit: {}\nchanged files: {}'.format(i, commit_msg, str_change_files): '{}'.format(error_change_msg).format(':sparkles:, :zap: or :ambulance:', changelog)}
         error_change_changelog_manifest_index_readme.update(error)
-        i += 1
+
     if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
         error_index_redme = {}
         for file in list_readme_index:
             if file in str_change_files:
                 continue
-            error = {'{} commit: {}'.format(i + 0.1, commit_msg): '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' and '.join(list_readme_index))}
+            i += 0.1
+            error = {'{} commit: {}\nnot changed file: {}'.format(i, commit_msg, file): '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' and '.join(list_readme_index))}
             error_index_redme.update(error)
-            i += 1
+
         error_change_changelog_manifest_index_readme.update(error_index_redme)
     print('error_change_changelog_manifest_index_readme\n{}'.format(error_change_changelog_manifest_index_readme))
     return error_change_changelog_manifest_index_readme
