@@ -108,6 +108,7 @@ def check_changelog_manifest_index_readme(commit_filename_versions):
             if changelog not in filename:
                 continue
             error_changelog = check_changelog_version(filename, commit_msg, versions, i)
+            print('error_changelog\n{}'.format(error_changelog))
             error_manifest_changelog.update(error_changelog)
             # if manifest in filename:
             #     error_manifest = check_manifest_version(error_version_msg, filename, commit_msg, versions)
