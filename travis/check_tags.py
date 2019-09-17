@@ -27,6 +27,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     if resp.status_code != 200:
         print('GITHUB API response for commits: %s', [resp, resp.headers, commits])
     commit_url = {}
+    sha_commits = []
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
@@ -36,18 +37,20 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         commit = commit.get('commit').get('message')
         print('Commit: %s' % commit)
         commit_url.update({commit: url_commit})
+        sha = commit.get('sha')
+        sha_commits.append(sha)
         if commit:
             first_word = commit.split(' ', 1)[0]
             if first_word == 'Revert':
                 continue
-            errors_commit = handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug)
+            errors_commit = handler_commit(commit, symbol_in_branch, version)
             real_errors.update(errors_commit)
-    error_version_docs = check_stable_branch_docs(commit_url)
+    error_version_docs = check_stable_branch_docs(commit_url, sha_commits)
     real_errors.update(error_version_docs)
     return real_errors
 
 
-def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_repo_slug, travis_pull_request_number, travis_branch, travis_pr_slug):
+def handler_commit(commit, symbol_in_branch, version):
     errors_commit = {}
     # looks tags starting at the beginning of the line and until first whitespace
     match_tags_commit = re.search(r'^(:[^\s]+:)', commit)
@@ -80,7 +83,7 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
     return errors_commit
 
 
-def check_stable_branch_docs(commit_url):
+def check_stable_branch_docs(commit_url, sha_commits):
     error_version_docs = {}
     commit_filename_versions = get_changed_version(commit_url)
     error_changelog_index_readme = check_changelog_manifest_index_readme(commit_filename_versions)
