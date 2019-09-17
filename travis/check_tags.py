@@ -1,14 +1,11 @@
-import ast
 import re
 import requests
 
-from getaddons import get_modules_changed, get_versions_info
 
 DEVELOPMENT_TAGS = [':memo:', ':fire:', ':fire_engine:', ':tv:', ':lock:', ':bath:', ':green_heart:', ':cat:', ':bomb:']
 RELEASE_TAGS = [':tada:', ':zap:', ':sparkles:', ':rainbow:', ':ambulance:', ':heart_eyes:', ':cherries:', ':book:',
                 ':euro:', ':handshake:', ':shield:', ':arrow_up:', ':arrow_down:', ':x:', ':sos:', ':peace_symbol:',
-                ':alien',
-]
+                ':alien:']
 VERSION_TAGS_DICT = {'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5', 'six': '6',
                     'seven': '7', 'eight': '8', 'nine': '9'}
 VERSION_TAGS = [':zero:', ':one:', ':two:', ':three:', ':four:', ':five:', ':six:', ':seven:', ':eight:', ':nine:']
@@ -36,6 +33,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             continue
         url_commit = commit.get('url')
         commit = commit.get('commit').get('message')
+        print('Commit: %s' % commit)
         commit_url.update({commit: url_commit})
         if commit:
             first_word = commit.split(' ', 1)[0]
@@ -83,7 +81,8 @@ def handler_commit(commit, symbol_in_branch, version, travis_build_dir, travis_r
 
 def check_stable_branch_docs(commit_url):
     error_version_docs = {}
-    commit_filename_versions = get_changed_version(commit_url)
+    commit_filename_versions, commit_manifest_versions = get_changed_version(commit_url)
+    print('commit_manifest_versions\n{}'.format(commit_manifest_versions))
     error_changelog_index_readme = check_changelog_manifest_index_readme(commit_filename_versions)
     error_version_docs.update(error_changelog_index_readme)
     return error_version_docs
@@ -205,8 +204,10 @@ def get_first_second_third_values(versions, first=False, second=False):
 def get_changed_version(commit_url):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
+    commit_manifest_versions = {}
     for commit, url in commit_url.items():
         filename_versions = {}
+        manifest_versions = {}
         url = url.replace('api.github.com', 'github.it-projects.info')
         commit_content = requests.get(url)
         commit_content = commit_content.json()
@@ -222,6 +223,7 @@ def get_changed_version(commit_url):
             if '__manifest__.py' in filename:
                 versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
                 filename_versions.update({filename: versions})
+                manifest_versions.update({filename: versions})
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d.\d)', patch)
                 filename_versions.update({filename: versions})
@@ -229,8 +231,9 @@ def get_changed_version(commit_url):
                 filename_versions.update({filename: 'Updated!'})
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
+        commit_manifest_versions.update(manifest_versions)
         commit_filename_versions[commit_msg] = filename_versions
-    return commit_filename_versions
+    return commit_filename_versions, commit_manifest_versions
 
 
 def check_version_tags(version_tags, list_tags, commit, version):
