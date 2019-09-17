@@ -224,7 +224,7 @@ def get_changed_version(commit_url):
             patch = file.get('patch')
             if '__manifest__.py' in filename:
                 versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
-                filename_versions.update({filename: versions})
+                # filename_versions.update({filename: versions})
                 manifest_versions.update({filename: versions})
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d.\d)', patch)
@@ -234,7 +234,7 @@ def get_changed_version(commit_url):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_manifest_versions.update({'{} commit: {}'.format(i, commit_msg): manifest_versions})
-        commit_filename_versions.update({'{} commit: {}'.format(i, commit_msg): filename_versions})
+        commit_filename_versions[commit_msg] = filename_versions
     return commit_filename_versions, commit_manifest_versions
 
 
