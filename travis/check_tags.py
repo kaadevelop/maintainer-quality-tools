@@ -205,9 +205,11 @@ def get_changed_version(commit_url):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
     commit_manifest_versions = {}
+    i = 0
     for commit, url in commit_url.items():
         filename_versions = {}
         manifest_versions = {}
+        i += 1
         url = url.replace('api.github.com', 'github.it-projects.info')
         commit_content = requests.get(url)
         commit_content = commit_content.json()
@@ -231,8 +233,8 @@ def get_changed_version(commit_url):
                 filename_versions.update({filename: 'Updated!'})
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
-        commit_manifest_versions.update(manifest_versions)
-        commit_filename_versions[commit_msg] = filename_versions
+        commit_manifest_versions.update({'{} commit: {}'.format(i, commit_msg): manifest_versions})
+        commit_filename_versions.update({'{} commit: {}'.format(i, commit_msg): filename_versions})
     return commit_filename_versions, commit_manifest_versions
 
 
