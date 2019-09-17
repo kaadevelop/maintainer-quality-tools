@@ -44,7 +44,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
                 continue
             errors_commit = handler_commit(commit, symbol_in_branch, version)
             real_errors.update(errors_commit)
-    error_version_docs = check_stable_branch_docs(commit_url, sha_commits)
+    error_version_docs = check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug)
     real_errors.update(error_version_docs)
     return real_errors
 
@@ -82,17 +82,17 @@ def handler_commit(commit, symbol_in_branch, version):
     return errors_commit
 
 
-def check_stable_branch_docs(commit_url, sha_commits):
+def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
     error_version_docs = {}
-    commit_filename_versions, commit_manifest_versions = get_changed_version(commit_url)
-    print('commit_manifest_versions\n{}'.format(commit_manifest_versions))
-    error_changelog_index_readme = check_changelog_manifest_index_readme(commit_filename_versions, commit_manifest_versions)
-
+    commit_filename_versions = get_changed_version(commit_url)
+    error_changelog_index_readme = check_changelog_manifest_index_readme(commit_filename_versions)
+    # https://developer.github.com/v3/repos/commits/#compare-two-commits
+    manifest_version = get_manifest_version(travis_repo_slug, sha_commits)
     error_version_docs.update(error_changelog_index_readme)
     return error_version_docs
 
 
-def check_changelog_manifest_index_readme(commit_filename_versions, commit_manifest_versions):
+def check_changelog_manifest_index_readme(commit_filename_versions):
     changelog = 'doc/changelog.rst'
     manifest = '__manifest__.py'
     error_changelog_manifest_index_readme = {}
@@ -109,18 +109,22 @@ def check_changelog_manifest_index_readme(commit_filename_versions, commit_manif
             error_changelog = check_changelog_version(filename, commit_msg, versions, i)
             error_manifest_changelog.update(error_changelog)
         error_changelog_manifest_index_readme.update(error_manifest_changelog)
-    for commit_msg, manifest_versions in commit_manifest_versions.items():
-        i += 1
-        error_manifest = {}
-        for manifest_file, versions in manifest_versions.items():
-            if manifest not in manifest_file:
-                continue
-            error_manifest_version = check_manifest_version(manifest_file, commit_msg, versions, i)
-            error_manifest.update(error_manifest_version)
-        error_changelog_manifest_index_readme.update(error_manifest)
+
     return error_changelog_manifest_index_readme
 
-
+def get_manifest_version(travis_repo_slug, sha_commits):
+    print('sha_commits\n{}'.format(sha_commits))
+    sha_start = sha_commits[0]
+    sha_end = sha_commits[-1]
+    # GET /repos/:owner/:repo/compare/:base...:head
+    url_request = 'https://github.it-projects.info/repos/%s/compare/%s...%s' % (
+                            str(travis_repo_slug), str(sha_start),  str(sha_end))
+    resp = requests.get(url_request)
+    compare = resp.json()
+    if resp.status_code != 200:
+        print('GITHUB API response for compare two commits: %s', [resp, resp.headers, compare])
+    print('compare\n{}'.format(compare))
+    return compare
 # def check_manifest_version(error_version_msg, filename, commit_msg, versions):
 #     value_first_old, value_first_new = get_first_second_third_values(versions, first=True)
 #     value_second_old, value_second_new = get_first_second_third_values(versions, second=True)
@@ -247,9 +251,9 @@ def get_changed_version(commit_url):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         # commit_manifest_versions.update({'{} commit: {}'.format(i, commit_msg): manifest_versions})
-        commit_manifest_versions[commit_msg] = manifest_versions
+        # commit_manifest_versions[commit_msg] = manifest_versions
         commit_filename_versions[commit_msg] = filename_versions
-    return commit_filename_versions, commit_manifest_versions
+    return commit_filename_versions
 
 
 def check_version_tags(version_tags, list_tags, commit, version):
