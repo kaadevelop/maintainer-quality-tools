@@ -84,15 +84,19 @@ def handler_commit(commit, symbol_in_branch, version):
 
 def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
     error_version_docs = {}
-    commit_filename_versions = get_changed_version(commit_url)
-    error_changelog_index_readme = check_changelog_manifest_index_readme(commit_filename_versions)
+    commit_filename_versions, commit_manifest = get_changed_version(commit_url)
+    print('commit_manifest\n{}'.format(commit_manifest))
     # https://developer.github.com/v3/repos/commits/#compare-two-commits
     manifest_version = get_manifest_version(travis_repo_slug, sha_commits)
+    print('manifest_version\n{}'.format(manifest_version))
+    error_changelog_index_readme = check_changelog_index_readme(commit_filename_versions)
+    # for manifest, versions in manifest_version.items():
+    #     error_manifest_version = check_manifest_version(manifest, versions )
     error_version_docs.update(error_changelog_index_readme)
     return error_version_docs
 
 
-def check_changelog_manifest_index_readme(commit_filename_versions):
+def check_changelog_index_readme(commit_filename_versions):
     changelog = 'doc/changelog.rst'
     error_changelog_manifest_index_readme = {}
     i = 0
@@ -101,15 +105,15 @@ def check_changelog_manifest_index_readme(commit_filename_versions):
         list_changed_files = [filename for filename in filename_versions.keys()]
         error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog, i)
         error_changelog_manifest_index_readme.update(error_change_changelog_index_readme)
-        error_manifest_changelog = {}
+        error_changelog = {}
         for filename, versions in filename_versions.items():
             if changelog not in filename:
                 continue
             error_changelog = check_changelog_version(filename, commit_msg, versions, i)
-            error_manifest_changelog.update(error_changelog)
-        error_changelog_manifest_index_readme.update(error_manifest_changelog)
-
+            error_changelog.update(error_changelog)
+        error_changelog_manifest_index_readme.update(error_changelog)
     return error_changelog_manifest_index_readme
+
 
 def get_manifest_version(travis_repo_slug, sha_commits):
     manifest = '__manifest__.py'
@@ -123,15 +127,18 @@ def get_manifest_version(travis_repo_slug, sha_commits):
     if resp.status_code != 200:
         print('GITHUB API response for compare two commits: %s', [resp, resp.headers, compare])
     updated_files = compare.get('files')
-    manifest_patch = {}
+    manifest_versions = {}
     for file in updated_files:
         filename = file.get('filename')
-        if manifest in filename:
-            patch = file.get('patch')
-            manifest_patch[filename] = patch
-    print('manifest_patch\n{}'.format(manifest_patch))
-    return manifest_patch
-# def check_manifest_version(error_version_msg, filename, commit_msg, versions):
+        if manifest not in filename:
+            continue
+        patch = file.get('patch')
+        versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
+        manifest_versions[filename] = versions
+    return manifest_versions
+
+
+# def check_manifest_version(manifest, versions ):
 #     value_first_old, value_first_new = get_first_second_third_values(versions, first=True)
 #     value_second_old, value_second_new = get_first_second_third_values(versions, second=True)
 #     value_third_old, value_third_new = get_first_second_third_values(versions)
@@ -227,11 +234,10 @@ def get_first_second_third_values(versions, first=False, second=False):
 def get_changed_version(commit_url):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
-    commit_manifest_versions = {}
+    commit_manifest = {}
     i = 0
     for commit, url in commit_url.items():
         filename_versions = {}
-        manifest_versions = {}
         i += 1
         url = url.replace('api.github.com', 'github.it-projects.info')
         commit_content = requests.get(url)
@@ -246,9 +252,7 @@ def get_changed_version(commit_url):
             filename = file.get('filename')
             patch = file.get('patch')
             if '__manifest__.py' in filename:
-                versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
-                # filename_versions.update({filename: versions})
-                manifest_versions.update({filename: versions})
+                commit_manifest.update({commit_msg: filename})
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d.\d)', patch)
                 filename_versions.update({filename: versions})
@@ -256,10 +260,8 @@ def get_changed_version(commit_url):
                 filename_versions.update({filename: 'Updated!'})
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
-        # commit_manifest_versions.update({'{} commit: {}'.format(i, commit_msg): manifest_versions})
-        # commit_manifest_versions[commit_msg] = manifest_versions
         commit_filename_versions[commit_msg] = filename_versions
-    return commit_filename_versions
+    return commit_filename_versions, commit_manifest
 
 
 def check_version_tags(version_tags, list_tags, commit, version):
