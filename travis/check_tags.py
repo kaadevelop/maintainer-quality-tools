@@ -117,14 +117,14 @@ def get_manifest_version(travis_repo_slug, sha_commits):
     sha_start = sha_commits[0]
     sha_end = sha_commits[-1]
     # GET /repos/:owner/:repo/compare/:base...:head
-    # url_request = 'https://github.it-projects.info/repos/%s/compare/%s...%s' % (
-    #                         str(travis_repo_slug), str(sha_start),  str(sha_end))
-    # resp = requests.get(url_request)
-    # compare = resp.json()
-    # if resp.status_code != 200:
-    #     print('GITHUB API response for compare two commits: %s', [resp, resp.headers, compare])
-    # print('compare\n{}'.format(compare))
-    return sha_commits
+    url_request = 'https://github.it-projects.info/repos/%s/compare/%s...%s' % (
+                            str(travis_repo_slug), str(sha_start),  str(sha_end))
+    resp = requests.get(url_request)
+    compare = resp.json()
+    if resp.status_code != 200:
+        print('GITHUB API response for compare two commits: %s', [resp, resp.headers, compare])
+    print('compare\n{}'.format(compare))
+    return compare
 # def check_manifest_version(error_version_msg, filename, commit_msg, versions):
 #     value_first_old, value_first_new = get_first_second_third_values(versions, first=True)
 #     value_second_old, value_second_new = get_first_second_third_values(versions, second=True)
