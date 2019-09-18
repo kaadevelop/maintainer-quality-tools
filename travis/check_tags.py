@@ -94,7 +94,6 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
 
 def check_changelog_manifest_index_readme(commit_filename_versions):
     changelog = 'doc/changelog.rst'
-    manifest = '__manifest__.py'
     error_changelog_manifest_index_readme = {}
     i = 0
     for commit_msg, filename_versions in commit_filename_versions.items():
@@ -113,7 +112,7 @@ def check_changelog_manifest_index_readme(commit_filename_versions):
     return error_changelog_manifest_index_readme
 
 def get_manifest_version(travis_repo_slug, sha_commits):
-    print('sha_commits\n{}'.format(sha_commits))
+    manifest = '__manifest__.py'
     sha_start = sha_commits[0]
     sha_end = sha_commits[-1]
     # GET /repos/:owner/:repo/compare/:base...:head
@@ -124,8 +123,14 @@ def get_manifest_version(travis_repo_slug, sha_commits):
     if resp.status_code != 200:
         print('GITHUB API response for compare two commits: %s', [resp, resp.headers, compare])
     updated_files = compare.get('files')
-    print('updated_files\n{}'.format(updated_files))
-    return updated_files
+    manifest_patch = {}
+    for file in updated_files:
+        filename = file.get('filename')
+        if manifest in filename:
+            patch = file.get('patch')
+            manifest_patch[filename] = patch
+    print('manifest_patch\n{}'.format(manifest_patch))
+    return manifest_patch
 # def check_manifest_version(error_version_msg, filename, commit_msg, versions):
 #     value_first_old, value_first_new = get_first_second_third_values(versions, first=True)
 #     value_second_old, value_second_new = get_first_second_third_values(versions, second=True)
