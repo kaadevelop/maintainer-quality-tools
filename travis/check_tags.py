@@ -33,10 +33,10 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
             # we don't check merge commits
             continue
         url_commit = commit.get('url')
+        sha = commit.get('sha')
         commit = commit.get('commit').get('message')
         print('Commit: %s' % commit)
         commit_url.update({commit: url_commit})
-        sha = commit.get('sha')
         sha_commits.append(sha)
         if commit:
             first_word = commit.split(' ', 1)[0]
