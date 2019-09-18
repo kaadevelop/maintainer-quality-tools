@@ -123,8 +123,9 @@ def get_manifest_version(travis_repo_slug, sha_commits):
     compare = resp.json()
     if resp.status_code != 200:
         print('GITHUB API response for compare two commits: %s', [resp, resp.headers, compare])
-    print('compare\n{}'.format(compare))
-    return compare
+    updated_files = compare.get('files')
+    print('updated_files\n{}'.format(updated_files))
+    return updated_files
 # def check_manifest_version(error_version_msg, filename, commit_msg, versions):
 #     value_first_old, value_first_new = get_first_second_third_values(versions, first=True)
 #     value_second_old, value_second_new = get_first_second_third_values(versions, second=True)
