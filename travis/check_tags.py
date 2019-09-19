@@ -84,14 +84,14 @@ def handler_commit(commit, symbol_in_branch, version):
 
 def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
     error_version_docs = {}
-    commit_filename_versions, manifest_commit = get_changed_version(commit_url)
+    commit_filename_versions, commit_manifest = get_changed_version(commit_url)
     # https://developer.github.com/v3/repos/commits/#compare-two-commits
 
-    print('manifest_commit\n{}'.format(manifest_commit))
+    print('commit_manifest\n{}'.format(commit_manifest))
     manifest_version = get_manifest_version(travis_repo_slug, sha_commits)
     print('manifest_version\n{}'.format(manifest_version))
     manifest_version_commit = {}
-    for _manifest_, commit in manifest_commit.items():
+    for commit, _manifest_ in commit_manifest.items():
         for manifest, version in manifest_version.items():
             if manifest == _manifest_:
                 manifest_version_commit.update({{manifest: version}: commit})
@@ -241,7 +241,7 @@ def get_first_second_third_values(versions, first=False, second=False):
 def get_changed_version(commit_url):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
-    manifest_commit = {}
+    commit_manifest = {}
     i = 0
     for commit, url in commit_url.items():
         filename_versions = {}
@@ -259,7 +259,7 @@ def get_changed_version(commit_url):
             filename = file.get('filename')
             patch = file.get('patch')
             if '__manifest__.py' in filename:
-                manifest_commit.update({filename: commit_msg})
+                commit_manifest.update({commit_msg: filename})
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d.\d)', patch)
                 versions = sorted(versions)
@@ -269,7 +269,7 @@ def get_changed_version(commit_url):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
-    return commit_filename_versions, manifest_commit
+    return commit_filename_versions, commit_manifest
 
 
 def check_version_tags(version_tags, list_tags, commit, version):
