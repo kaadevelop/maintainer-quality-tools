@@ -259,7 +259,7 @@ def get_changed_version(commit_url):
                 commit_manifest.update({commit_msg: filename})
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d.\d)', patch)
-                print('patch for changelog\n{}'.format(patch))
+                versions = sorted(versions)
                 filename_versions.update({filename: versions})
             if 'doc/index.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
