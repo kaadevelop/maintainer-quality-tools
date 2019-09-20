@@ -86,11 +86,6 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
     error_version_docs = {}
     commit_filename_versions, commit_manifest = get_changed_version(commit_url)
     print('commit_manifest\n{}'.format(commit_manifest))
-    manifest_tags = {}
-    for commit, manifest in commit_manifest.items():
-        tags = []
-        manifest_tags.update({manifest: tags.append()})
-
     # https://developer.github.com/v3/repos/commits/#compare-two-commits
     manifest_version = get_manifest_version(travis_repo_slug, sha_commits)
     print('manifest_version\n{}'.format(manifest_version))
