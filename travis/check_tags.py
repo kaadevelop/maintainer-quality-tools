@@ -148,34 +148,56 @@ def get_manifest_version(travis_repo_slug, sha_commits):
 
 
 def check_manifest_version(manifest, versions, str_commit, i):
-    error_version_msg_value = 'If you use tag {} the version in the "{}" file must be updated to {}!'
-    error_version_msg_key = '{} commit: {}\nold version is {} and new version is {}'
-    value_first_old, value_first_new = get_first_second_third_values(versions, first=True)
-    value_second_old, value_second_new = get_first_second_third_values(versions, second=True)
-    value_third_old, value_third_new = get_first_second_third_values(versions)
+    error_version_msg_value = 'If you use tag(s) {} the version in the "{}" file must be updated to {}!'
+    error_version_msg_key = '{} commit(s): {}\nold version is {} and new version is {}'
     error_manifest = {}
     version_old = versions[0]
     base_version = re.search(r'^(\d+.\d).', version_old).group(1)
     match_tags_commit = re.findall(r'(:[^\s]+:)', str_commit)
+    match_tags_commit_str = ', '.join(match_tags_commit)
+    versions_need = versions
+    version_true = versions[-1]
+    error_indicator = False
     for tag in match_tags_commit:
         if tag == ':sparkles:':
+            value_first_old, value_first_new = get_first_second_third_values(versions_need, first=True)
+            value_second_old, value_second_new = get_first_second_third_values(versions_need, second=True)
+            value_third_old, value_third_new = get_first_second_third_values(versions_need)
             if value_first_new - value_first_old != 1 or value_second_new != 0 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old + 1, 0, 0)
-                error = {'{}'.format(error_version_msg_key).format(i, str_commit, versions[0], versions[1]):
-                             '{}'.format(error_version_msg_value).format(':sparkles:', manifest, version_true)}
-                error_manifest.update(error)
+                if error_indicator:
+                    versions_need = [versions_need[-1], version_true]
+                else:
+                    versions_need = [version_true, version_true]
+                    error_indicator = True
         if tag == ':zap:':
+            value_first_old, value_first_new = get_first_second_third_values(versions_need, first=True)
+            value_second_old, value_second_new = get_first_second_third_values(versions_need, second=True)
+            value_third_old, value_third_new = get_first_second_third_values(versions_need)
             if value_second_new - value_second_old != 1 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old + 1, 0)
-                error = {'{}'.format(error_version_msg_key).format(i, str_commit, versions[0], versions[1]):
-                             '{}'.format(error_version_msg_value).format(':zap:', manifest, version_true)}
-                error_manifest.update(error)
+                if error_indicator:
+                    versions_need = [versions_need[-1], version_true]
+                else:
+                    versions_need = [version_true, version_true]
+                    error_indicator = True
         if tag == ':ambulance:':
+            value_first_old, value_first_new = get_first_second_third_values(versions_need, first=True)
+            value_second_old, value_second_new = get_first_second_third_values(versions_need, second=True)
+            value_third_old, value_third_new = get_first_second_third_values(versions_need)
             if value_third_new - value_third_old != 1:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old, value_third_old + 1)
-                error = {'{}'.format(error_version_msg_key).format(i, str_commit, versions[0], versions[1]):
-                             '{}'.format(error_version_msg_value).format(':ambulance:', manifest, version_true)}
-                error_manifest.update(error)
+                if error_indicator:
+                    versions_need = [versions_need[-1], version_true]
+                else:
+                    versions_need = [version_true, version_true]
+                    error_indicator = True
+    if error_indicator:
+        error = {'{}'.format(error_version_msg_key).format(i, str_commit, versions[0], versions[1]):
+                     '{}'.format(error_version_msg_value).format(match_tags_commit_str, manifest, version_true)}
+    else:
+        error = {}
+    error_manifest.update(error)
     return error_manifest
 
 
