@@ -84,6 +84,7 @@ def handler_commit(commit, symbol_in_branch, version):
 
 def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
     error_version_docs = {}
+    error_manifest = {}
     commit_filename_versions, commit_manifest = get_changed_version(commit_url)
     manifest_commits = {}
     for commit, manifest in commit_manifest.items():
@@ -100,6 +101,7 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
         commit = commit[::-1]
         str_commit = ', '.join(commit)
         error_manifest = check_manifest_version(manifest, versions, str_commit, i)
+    error_version_docs.update(error_manifest)
     error_changelog_index_readme = check_changelog_index_readme(commit_filename_versions)
     error_version_docs.update(error_changelog_index_readme)
     return error_version_docs
