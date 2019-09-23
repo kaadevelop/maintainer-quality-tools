@@ -161,6 +161,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
     for tag in match_tags_commit:
         if tag == ':sparkles:':
             value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
+            print('value_first_old {}\n, value_first_new {}\n, value_second_old {}\n, value_second_new {}\n, value_third_old {}\n, value_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_first_new - value_first_old != 1 or value_second_new != 0 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old + 1, 0, 0)
                 if error_indicator:
@@ -170,6 +171,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
                     error_indicator = True
         if tag == ':zap:':
             value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
+            print('value_first_old {}\n, value_first_new {}\n, value_second_old {}\n, value_second_new {}\n, value_third_old {}\n, value_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_second_new - value_second_old != 1 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old + 1, 0)
                 if error_indicator:
@@ -179,6 +181,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
                     error_indicator = True
         if tag == ':ambulance:':
             value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
+            print('value_first_old {}\n, value_first_new {}\n, value_second_old {}\n, value_second_new {}\n, value_third_old {}\n, value_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_third_new - value_third_old != 1:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old, value_third_old + 1)
                 if error_indicator:
