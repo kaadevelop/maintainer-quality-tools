@@ -153,6 +153,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
     error_manifest = {}
     version_old = versions[0]
     base_version = re.search(r'^(\d+.\d+).', version_old).group(1)
+    print('str_commit is {}'.format(str_commit))
     match_tags_commit = re.findall(r'(:[^\s]+:)', str_commit)
     match_tags_commit_str = ', '.join(match_tags_commit)
     versions_need = versions
