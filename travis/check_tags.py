@@ -99,7 +99,7 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
         commit = commit[::-1]
         str_commit = ', '.join(commit)
         error_manifest = check_manifest_version(manifest, versions, str_commit, i)
-    error_version_docs.update(error_manifest)
+        error_version_docs.update(error_manifest)
     error_changelog_index_readme = check_changelog_index_readme(commit_filename_versions)
     error_version_docs.update(error_changelog_index_readme)
     return error_version_docs
@@ -160,7 +160,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
     error_indicator = False
     for tag in match_tags_commit:
         if tag == ':sparkles:':
-            value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
+            value_first_old, value_second_old, value_third_old, value_first_new,  value_second_new,  value_third_new = get_first_second_third_values(versions)
             print('value_first_old {}\n, value_first_new {}\n, value_second_old {}\n, value_second_new {}\n, value_third_old {}\n, value_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_first_new - value_first_old != 1 or value_second_new != 0 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old + 1, 0, 0)
@@ -170,7 +170,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
                     versions_need = [version_true, version_true]
                     error_indicator = True
         if tag == ':zap:':
-            value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
+            value_first_old, value_second_old, value_third_old, value_first_new,  value_second_new,  value_third_new = get_first_second_third_values(versions)
             print('value_first_old {}\n, value_first_new {}\n, value_second_old {}\n, value_second_new {}\n, value_third_old {}\n, value_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_second_new - value_second_old != 1 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old + 1, 0)
@@ -180,7 +180,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
                     versions_need = [version_true, version_true]
                     error_indicator = True
         if tag == ':ambulance:':
-            value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
+            value_first_old, value_second_old, value_third_old, value_first_new,  value_second_new,  value_third_new = get_first_second_third_values(versions)
             print('value_first_old {}\n, value_first_new {}\n, value_second_old {}\n, value_second_new {}\n, value_third_old {}\n, value_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_third_new - value_third_old != 1:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old, value_third_old + 1)
@@ -202,7 +202,7 @@ def check_changelog_version(filename, commit_msg, versions, i):
     error_version_msg_value = 'If you use tag {} the version in the "{}" file must be updated to {}!'
     error_version_msg_key = '{} commit: {}\nold version is {} and new version is {}'
     error_changelog = {}
-    value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
+    value_first_old, value_second_old, value_third_old, value_first_new,  value_second_new,  value_third_new = get_first_second_third_values(versions)
     if ':sparkles:' in commit_msg:
         if value_first_new - value_first_old != 1 or value_second_new != 0 or value_third_new != 0:
             version_true = '{}.{}.{}'.format(value_first_old + 1, 0, 0)
@@ -246,16 +246,10 @@ def get_change_changelog_index_readme_file(commit_msg, list_changed_files, chang
 
 
 def get_first_second_third_values(versions):
-    if len(versions[0]) > 5:
-        match = r'^\d+.\d+.(\d+).(\d+).(\d+)'
-    else:
-         match = r'^(\d+).(\d+).(\d+)'
-    values_old, values_new = [list((re.search(match, value)).groups()) for value in versions]
-    values_first, values_second, values_third = [[int(x), int(y)] for x, y in zip(values_old, values_new)]
-    value_first_old, value_first_new = values_first
-    value_second_old, value_second_new = values_second
-    value_third_old, value_third_new = values_third
-    return value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new
+    result = []
+    for version in versions:
+        result += list(re.match(r".*(\d+)\.(\d+)\.(\d+)$", version).groups())
+    return result
 
 
 def get_changed_version(commit_url):
