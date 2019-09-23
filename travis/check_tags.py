@@ -141,7 +141,7 @@ def get_manifest_version(travis_repo_slug, sha_commits):
         if manifest not in filename:
             continue
         patch = file.get('patch')
-        versions = re.findall(r'(\d+.\d.\d.\d.\d)', patch)
+        versions = re.findall(r'(\d+.\d+.\d+.\d+.\d+)', patch)
         manifest_versions[filename] = versions
     return manifest_versions
 
@@ -151,7 +151,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
     error_version_msg_key = '{} commit(s): {}\nold version is {} and new version is {}'
     error_manifest = {}
     version_old = versions[0]
-    base_version = re.search(r'^(\d+.\d).', version_old).group(1)
+    base_version = re.search(r'^(\d+.\d+).', version_old).group(1)
     match_tags_commit = re.findall(r'(:[^\s]+:)', str_commit)
     match_tags_commit_str = ', '.join(match_tags_commit)
     versions_need = versions
@@ -159,9 +159,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
     error_indicator = False
     for tag in match_tags_commit:
         if tag == ':sparkles:':
-            value_first_old, value_first_new = get_first_second_third_values(versions_need, first=True)
-            value_second_old, value_second_new = get_first_second_third_values(versions_need, second=True)
-            value_third_old, value_third_new = get_first_second_third_values(versions_need)
+            value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
             if value_first_new - value_first_old != 1 or value_second_new != 0 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old + 1, 0, 0)
                 if error_indicator:
@@ -170,9 +168,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
                     versions_need = [version_true, version_true]
                     error_indicator = True
         if tag == ':zap:':
-            value_first_old, value_first_new = get_first_second_third_values(versions_need, first=True)
-            value_second_old, value_second_new = get_first_second_third_values(versions_need, second=True)
-            value_third_old, value_third_new = get_first_second_third_values(versions_need)
+            value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
             if value_second_new - value_second_old != 1 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old + 1, 0)
                 if error_indicator:
@@ -181,9 +177,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
                     versions_need = [version_true, version_true]
                     error_indicator = True
         if tag == ':ambulance:':
-            value_first_old, value_first_new = get_first_second_third_values(versions_need, first=True)
-            value_second_old, value_second_new = get_first_second_third_values(versions_need, second=True)
-            value_third_old, value_third_new = get_first_second_third_values(versions_need)
+            value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
             if value_third_new - value_third_old != 1:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old, value_third_old + 1)
                 if error_indicator:
@@ -204,9 +198,7 @@ def check_changelog_version(filename, commit_msg, versions, i):
     error_version_msg_value = 'If you use tag {} the version in the "{}" file must be updated to {}!'
     error_version_msg_key = '{} commit: {}\nold version is {} and new version is {}'
     error_changelog = {}
-    value_first_old, value_first_new = get_first_second_third_values(versions, first=True)
-    value_second_old, value_second_new = get_first_second_third_values(versions, second=True)
-    value_third_old, value_third_new = get_first_second_third_values(versions)
+    value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new = get_first_second_third_values(versions)
     if ':sparkles:' in commit_msg:
         if value_first_new - value_first_old != 1 or value_second_new != 0 or value_third_new != 0:
             version_true = '{}.{}.{}'.format(value_first_old + 1, 0, 0)
@@ -249,23 +241,17 @@ def get_change_changelog_index_readme_file(commit_msg, list_changed_files, chang
     return error_change_changelog_manifest_index_readme
 
 
-def get_first_second_third_values(versions, first=False, second=False):
+def get_first_second_third_values(versions):
     if len(versions[0]) > 5:
-        if first:
-            match = r'^\d+.\d.(\d).'
-        elif second:
-            match = r'^\d+.\d.\d.(\d).'
-        else:
-            match = r'^\d+.\d.\d.\d.(\d)'
+        match = r'^\d+.\d+.(\d+).(\d+).(\d+)'
     else:
-        if first:
-            match = r'^(\d).'
-        elif second:
-            match = r'^\d.(\d).'
-        else:
-            match = r'^\d.\d.(\d)'
-    values = [int((re.search(match, value)).group(1)) for value in versions]
-    return values
+         match = r'^(\d+).(\d+).(\d+)'
+    values_old, values_new = [list((re.search(match, value)).groups()) for value in versions]
+    values_first, values_second, values_third = [[int(x), int(y)] for x, y in zip(values_old, values_new)]
+    value_first_old, value_first_new = values_first
+    value_second_old, value_second_new = values_second
+    value_third_old, value_third_new = values_third
+    return value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new
 
 
 def get_changed_version(commit_url):
@@ -291,7 +277,7 @@ def get_changed_version(commit_url):
             if '__manifest__.py' in filename:
                 commit_manifest.update({commit_msg: filename})
             if 'doc/changelog.rst' in filename:
-                versions = re.findall(r'(\d+.\d.\d)', patch)
+                versions = re.findall(r'(\d+.\d+.\d+)', patch)
                 versions = sorted(versions)
                 filename_versions.update({filename: versions})
             if 'doc/index.rst' in filename:
