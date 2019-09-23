@@ -158,12 +158,14 @@ def check_manifest_version(manifest, versions, str_commit, i):
     versions_need = versions
     version_true = versions[-1]
     error_indicator = False
+    print('match_tags_commit {}'.format(match_tags_commit))
     for tag in match_tags_commit:
         if tag == ':sparkles:':
             value_first_old, value_second_old, value_third_old, value_first_new,  value_second_new,  value_third_new = get_first_second_third_values(versions_need)
             print(':sparkles:\nvalue_first_old {}\nvalue_first_new {}\nvalue_second_old {}\nvalue_second_new {}\nvalue_third_old {}\nvalue_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_first_new - value_first_old != 1 or value_second_new != 0 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old + 1, 0, 0)
+                print(':sparkles: version_true {}'.format(version_true))
                 if error_indicator:
                     versions_need = [versions_need[-1], version_true]
                 else:
@@ -174,6 +176,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
             print(':zap:\nvalue_first_old {}\nvalue_first_new {}\nvalue_second_old {}\nvalue_second_new {}\nvalue_third_old {}\nvalue_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_second_new - value_second_old != 1 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old + 1, 0)
+                print(':zap: version_true {}'.format(version_true))
                 if error_indicator:
                     versions_need = [versions_need[-1], version_true]
                 else:
@@ -184,6 +187,7 @@ def check_manifest_version(manifest, versions, str_commit, i):
             print(':ambulance:\nvalue_first_old {}\nvalue_first_new {}\nvalue_second_old {}\nvalue_second_new {}\nvalue_third_old {}\nvalue_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_third_new - value_third_old != 1:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old, value_third_old + 1)
+                print(':ambulance: version_true {}'.format(version_true))
                 if error_indicator:
                     versions_need = [versions_need[-1], version_true]
                 else:
