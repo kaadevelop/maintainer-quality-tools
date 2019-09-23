@@ -249,6 +249,7 @@ def get_first_second_third_values(versions):
     result = []
     for version in versions:
         result += list(re.match(r".*(\d+)\.(\d+)\.(\d+)$", version).groups())
+    result = list(map(int, result))
     return result
 
 
