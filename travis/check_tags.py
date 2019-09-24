@@ -85,10 +85,8 @@ def handler_commit(commit, symbol_in_branch, version):
 
 def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
     error_version_docs = {}
-    error_manifest = {}
     commit_filename_versions, commit_manifest = get_changed_version(commit_url)
     manifest_commits = {}
-    print('commit_manifest from get_changed_version is\n{}'.format(commit_manifest))
     for commit, manifest in commit_manifest.items():
         manifest_commits.setdefault(manifest, [])
         manifest_commits[manifest].append(commit)
@@ -96,11 +94,8 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
     manifest_version = get_manifest_version(travis_repo_slug, sha_commits)
     i = 0
     for manifest, commit in manifest_commits.items():
-        print('commit before revert is {}'.format(commit))
         i += 1
         versions = manifest_version.get(manifest)
-        # commit = commit[::-1]
-        # print('commit after revert is {}'.format(commit))
         str_commit = ', '.join(commit)
         error_manifest = check_manifest_version(manifest, versions, str_commit, i)
         error_version_docs.update(error_manifest)
@@ -157,20 +152,16 @@ def check_manifest_version(manifest, versions, str_commit, i):
     error_manifest = {}
     version_old = versions[0]
     base_version = re.search(r'^(\d+.\d+).', version_old).group(1)
-    print('str_commit is {}'.format(str_commit))
     match_tags_commit = re.findall(r'(:[^\s]+:)', str_commit)
     match_tags_commit_str = ', '.join(match_tags_commit)
     versions_need = versions
     version_true = versions[-1]
     error_indicator = False
-    print('match_tags_commit {}'.format(match_tags_commit))
     for tag in match_tags_commit:
         if tag == ':sparkles:':
             value_first_old, value_second_old, value_third_old, value_first_new,  value_second_new,  value_third_new = get_first_second_third_values(versions_need)
-            print(':sparkles:\nvalue_first_old {}\nvalue_first_new {}\nvalue_second_old {}\nvalue_second_new {}\nvalue_third_old {}\nvalue_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_first_new - value_first_old != 1 or value_second_new != 0 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old + 1, 0, 0)
-                print(':sparkles: version_true {}'.format(version_true))
                 if error_indicator:
                     versions_need = [versions_need[-1], version_true]
                 else:
@@ -178,10 +169,8 @@ def check_manifest_version(manifest, versions, str_commit, i):
                     error_indicator = True
         if tag == ':zap:':
             value_first_old, value_second_old, value_third_old, value_first_new,  value_second_new,  value_third_new = get_first_second_third_values(versions_need)
-            print(':zap:\nvalue_first_old {}\nvalue_first_new {}\nvalue_second_old {}\nvalue_second_new {}\nvalue_third_old {}\nvalue_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_second_new - value_second_old != 1 or value_third_new != 0:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old + 1, 0)
-                print(':zap: version_true {}'.format(version_true))
                 if error_indicator:
                     versions_need = [versions_need[-1], version_true]
                 else:
@@ -189,10 +178,8 @@ def check_manifest_version(manifest, versions, str_commit, i):
                     error_indicator = True
         if tag == ':ambulance:':
             value_first_old, value_second_old, value_third_old, value_first_new,  value_second_new,  value_third_new = get_first_second_third_values(versions_need)
-            print(':ambulance:\nvalue_first_old {}\nvalue_first_new {}\nvalue_second_old {}\nvalue_second_new {}\nvalue_third_old {}\nvalue_third_new {}\n'.format(value_first_old, value_first_new, value_second_old, value_second_new, value_third_old, value_third_new))
             if value_third_new - value_third_old != 1:
                 version_true = '{}.{}.{}.{}'.format(base_version, value_first_old, value_second_old, value_third_old + 1)
-                print(':ambulance: version_true {}'.format(version_true))
                 if error_indicator:
                     versions_need = [versions_need[-1], version_true]
                 else:
@@ -294,7 +281,6 @@ def get_changed_version(commit_url):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
-    print('commit_manifest\n{}'.format(commit_manifest))
     return commit_filename_versions, commit_manifest
 
 
