@@ -94,9 +94,11 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
     manifest_version = get_manifest_version(travis_repo_slug, sha_commits)
     i = 0
     for manifest, commit in manifest_commits.items():
+        print('commit before revert is {}'.format(commit))
         i += 1
         versions = manifest_version.get(manifest)
         commit = commit[::-1]
+        print('commit after revert is {}'.format(commit))
         str_commit = ', '.join(commit)
         error_manifest = check_manifest_version(manifest, versions, str_commit, i)
         error_version_docs.update(error_manifest)
