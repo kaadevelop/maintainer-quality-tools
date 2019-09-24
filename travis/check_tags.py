@@ -268,6 +268,7 @@ def get_changed_version(commit_url):
         if release_tag == []:
             continue
         files = commit_content.get('files')
+        print('files\n{}'.format(files))
         for file in files:
             filename = file.get('filename')
             patch = file.get('patch')
