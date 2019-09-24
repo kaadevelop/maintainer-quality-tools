@@ -231,11 +231,11 @@ def get_change_changelog_index_readme_file(commit_msg, list_changed_files, chang
         error_change_changelog_manifest_index_readme.update(error)
     if ':sparkles:' in commit_msg or ':zap:' in commit_msg:
         error_index_redme = {}
-        for file in list_readme_index:
-            if file in str_change_files:
-                continue
+        if 'README.rst' in str_change_files or 'doc/index.rst' in str_change_files:
+            pass
+        else:
             error = {'{} commit: {}\nupdated files: {}\nnot updated file: {}'.format(i, commit_msg, str_change_files, file):
-                    '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' and '.join(list_readme_index))}
+                    '{}'.format(error_change_msg).format(':sparkles: or :zap:', ' or '.join(list_readme_index))}
             error_index_redme.update(error)
         error_change_changelog_manifest_index_readme.update(error_index_redme)
     return error_change_changelog_manifest_index_readme
