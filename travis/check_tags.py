@@ -265,6 +265,7 @@ def get_changed_version(commit_url):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
     commit_manifest = {}
+    commit_manifest_list = []
     i = 0
     for commit, url in commit_url.items():
         filename_versions = {}
@@ -283,6 +284,7 @@ def get_changed_version(commit_url):
             patch = file.get('patch')
             if '__manifest__.py' in filename:
                 commit_manifest.update({commit_msg: filename})
+                commit_manifest_list.append((commit_msg, filename))
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d+.\d+)', patch)
                 versions = sorted(versions)
@@ -292,6 +294,7 @@ def get_changed_version(commit_url):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
+    print('commit_manifest_list\n{}'.format(commit_manifest_list))
     return commit_filename_versions, commit_manifest
 
 
