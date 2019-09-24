@@ -264,11 +264,10 @@ def get_first_second_third_values(versions):
 def get_changed_version(commit_url):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
-    manifest_dict = {}
+    commit_manifest = {}
     i = 0
     for commit, url in commit_url.items():
         # commit_manifest_list = []
-        commit_manifest = {}
         filename_versions = {}
         i += 1
         url = url.replace('api.github.com', 'github.it-projects.info')
@@ -284,8 +283,7 @@ def get_changed_version(commit_url):
             filename = file.get('filename')
             patch = file.get('patch')
             if '__manifest__.py' in filename:
-                commit_manifest.update({commit_msg: filename})
-                # commit_manifest_list.append((commit_msg, filename))
+                commit_manifest[commit_msg] = filename
             if 'doc/changelog.rst' in filename:
                 versions = re.findall(r'(\d+.\d+.\d+)', patch)
                 versions = sorted(versions)
@@ -295,9 +293,8 @@ def get_changed_version(commit_url):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
-        manifest_dict[commit_msg] = commit_manifest
-    print('manifest_dict\n{}'.format(manifest_dict))
-    return commit_filename_versions, manifest_dict
+    print('commit_manifest\n{}'.format(commit_manifest))
+    return commit_filename_versions, commit_manifest
 
 
 def check_version_tags(version_tags, list_tags, commit, version):
