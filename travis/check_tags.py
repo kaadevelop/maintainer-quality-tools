@@ -47,8 +47,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
                 continue
             errors_commit = handler_commit(commit, symbol_in_branch, version)
             real_errors.update(errors_commit)
-    print('commits_dict\n{}'.format(commits_dict))
-    error_version_docs = check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug)
+    error_version_docs = check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_dict)
     real_errors.update(error_version_docs)
     return real_errors
 
@@ -86,9 +85,9 @@ def handler_commit(commit, symbol_in_branch, version):
     return errors_commit
 
 
-def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug):
+def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_dict):
     error_version_docs = {}
-    commit_filename_versions, commit_manifest = get_changed_version(commit_url)
+    commit_filename_versions, commit_manifest = get_changed_version(commit_url, commits_dict)
     manifest_commits = {}
     for commit, manifest in commit_manifest.items():
         manifest_commits.setdefault(manifest, [])
@@ -253,10 +252,10 @@ def get_first_second_third_values(versions):
     return result
 
 
-def get_changed_version(commit_url):
+def get_changed_version(commit_url, commits_dict):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
-    commit_manifest = collections.OrderedDict()
+    commit_manifest = {}
     i = 0
     for commit, url in commit_url.items():
         # commit_manifest_list = []
@@ -286,9 +285,9 @@ def get_changed_version(commit_url):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
-    new_d = collections.OrderedDict(sorted(commit_manifest.items()))
     print('commit_manifest\n{}'.format(commit_manifest))
-    print('new_d\n{}'.format(new_d))
+    z = {**commits_dict, **commit_manifest}
+    print('z is {}'.format(z))
     return commit_filename_versions, commit_manifest
 
 
