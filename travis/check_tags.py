@@ -256,7 +256,7 @@ def get_first_second_third_values(versions):
 def get_changed_version(commit_url):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
-    commit_manifest = {}
+    commit_manifest = collections.OrderedDict()
     i = 0
     for commit, url in commit_url.items():
         # commit_manifest_list = []
