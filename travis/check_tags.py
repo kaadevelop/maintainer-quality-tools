@@ -29,6 +29,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     commit_url = {}
     sha_commits = []
     commits_order = collections.OrderedDict()
+    commits_order_list = []
     i = 0
     for commit in commits:
         parents_commit = commit.get('parents')
@@ -41,6 +42,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         print('Commit: %s' % commit)
         i += 1
         commits_order.setdefault(commit, i)
+        commits_order_list.append(commit)
         commit_url.update({commit: url_commit})
         sha_commits.append(sha)
         if commit:
@@ -49,7 +51,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
                 continue
             errors_commit = handler_commit(commit, symbol_in_branch, version)
             real_errors.update(errors_commit)
-    print('commits_order is {}'.format(commits_order))
+    print('commits_order_list is {}'.format(commits_order_list))
     error_version_docs = check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_order)
     real_errors.update(error_version_docs)
     return real_errors
