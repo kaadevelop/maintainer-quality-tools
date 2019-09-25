@@ -256,7 +256,7 @@ def get_first_second_third_values(versions):
 def get_changed_version(commit_url):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
-    commit_manifest = collections.OrderedDict()
+    commit_manifest = {}
     i = 0
     for commit, url in commit_url.items():
         # commit_manifest_list = []
@@ -286,7 +286,9 @@ def get_changed_version(commit_url):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
+    new_d = collections.OrderedDict(sorted(commit_manifest.items()))
     print('commit_manifest\n{}'.format(commit_manifest))
+    print('new_d\n{}'.format(new_d))
     return commit_filename_versions, commit_manifest
 
 
