@@ -290,7 +290,7 @@ def get_changed_version(commit_url, commits_order):
         commit_filename_versions[commit_msg] = filename_versions
     print('commit_manifest\n{}'.format(commit_manifest))
     # commit_manifest_sorted = [commit_manifest[k] for k in sorted(commits_order, key=commits_order.get)]
-    commit_manifest_sorted = sorted(commit_manifest.items(), key=commits_order.get)
+    commit_manifest_sorted = sorted(commit_manifest.items(), key=lambda x: commits_order[x])
     print('commit_manifest_sorted is {}'.format(commit_manifest_sorted))
     return commit_filename_versions, commit_manifest
 
