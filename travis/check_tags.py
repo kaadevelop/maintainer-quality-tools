@@ -39,7 +39,8 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         sha = commit.get('sha')
         commit = commit.get('commit').get('message')
         print('Commit: %s' % commit)
-        commits_order.setdefault(commit, i + 1)
+        i += 1
+        commits_order.setdefault(commit, i)
         commit_url.update({commit: url_commit})
         sha_commits.append(sha)
         if commit:
@@ -288,7 +289,8 @@ def get_changed_version(commit_url, commits_order):
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
     print('commit_manifest\n{}'.format(commit_manifest))
-    commit_manifest_sorted = [commit_manifest[k] for k in sorted(commits_order, key=commits_order.get)]
+    # commit_manifest_sorted = [commit_manifest[k] for k in sorted(commits_order, key=commits_order.get)]
+    commit_manifest_sorted = sorted(commit_manifest.items(), key=commits_order.get)
     print('commit_manifest_sorted is {}'.format(commit_manifest_sorted))
     return commit_filename_versions, commit_manifest
 
