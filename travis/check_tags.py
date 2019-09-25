@@ -288,8 +288,9 @@ def get_changed_version(commit_url, commits_order):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
-    commit_manifest = {**commits_order, **commit_manifest}
     print('commit_manifest\n{}'.format(commit_manifest))
+    commit_manifest2 = {**commits_order, **commit_manifest}
+    print('commit_manifest\n{}'.format(commit_manifest2))
     return commit_filename_versions, commit_manifest
 
 
