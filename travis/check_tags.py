@@ -28,7 +28,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         print('GITHUB API response for commits: %s', [resp, resp.headers, commits])
     commit_url = {}
     sha_commits = []
-    commits_dict = {}
+    commits_dict = collections.OrderedDict()
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
