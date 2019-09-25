@@ -90,6 +90,8 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_
     commit_filename_versions, commit_manifest = get_changed_version(commit_url, commits_order)
     manifest_commits = {}
     for commit, manifest in commit_manifest:
+        if manifest is None:
+            continue
         manifest_commits.setdefault(manifest, [])
         manifest_commits[manifest].append(commit)
     print('manifest_commits\n{}'.format(manifest_commits))
