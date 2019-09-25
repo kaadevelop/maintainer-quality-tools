@@ -94,7 +94,6 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_
             continue
         manifest_commits.setdefault(manifest, [])
         manifest_commits[manifest].append(commit)
-    print('manifest_commits\n{}'.format(manifest_commits))
     # https://developer.github.com/v3/repos/commits/#compare-two-commits
     manifest_version = get_manifest_version(travis_repo_slug, sha_commits)
     i = 0
@@ -260,7 +259,6 @@ def get_changed_version(commit_url, commits_order):
     for commit in commits_order:
         if ':sparkles:' in commit or ':zap:' in commit or ':ambulance:' in commit:
             commits_order_filtered.append(commit)
-    print('commits_order_filtered\n{}'.format(commits_order_filtered))
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
     commit_manifest = {}
@@ -290,7 +288,6 @@ def get_changed_version(commit_url, commits_order):
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
     commit_manifest = list((i, commit_manifest.get(i)) for i in commits_order_filtered)
-    print('commit_manifest\n{}'.format(commit_manifest))
     return commit_filename_versions, commit_manifest
 
 
