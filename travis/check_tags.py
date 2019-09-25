@@ -253,14 +253,16 @@ def get_first_second_third_values(versions):
 
 
 def get_changed_version(commit_url, commits_order):
+    commits_order_filtered = []
+    for commit in commits_order:
+        if ':sparkles:' in commit or ':zap:' in commit or ':ambulance:' in commit:
+            commits_order_filtered.append(commit)
+    print('commits_order_filtered\n{}'.format(commits_order_filtered))
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
     commit_manifest = {}
-    i = 0
     for commit, url in commit_url.items():
-        # commit_manifest_list = []
         filename_versions = {}
-        i += 1
         url = url.replace('api.github.com', 'github.it-projects.info')
         commit_content = requests.get(url)
         commit_content = commit_content.json()
@@ -284,7 +286,8 @@ def get_changed_version(commit_url, commits_order):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
-    commit_manifest = list((i, commit_manifest.get(i)) for i in commits_order)
+    commit_manifest = list((i, commit_manifest.get(i)) for i in commits_order_filtered)
+    print('commit_manifest\n{}'.format(commit_manifest))
     return commit_filename_versions, commit_manifest
 
 
