@@ -29,7 +29,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
     commit_url = {}
     sha_commits = []
     commits_order = collections.OrderedDict()
-    commits_order_list = []
+    commits_order = []
     i = 0
     for commit in commits:
         parents_commit = commit.get('parents')
@@ -40,9 +40,9 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         sha = commit.get('sha')
         commit = commit.get('commit').get('message')
         print('Commit: %s' % commit)
-        i += 1
-        commits_order.setdefault(commit, i)
-        commits_order_list.append(commit)
+        # i += 1
+        # commits_order.setdefault(commit, i)
+        commits_order.append(commit)
         commit_url.update({commit: url_commit})
         sha_commits.append(sha)
         if commit:
@@ -51,7 +51,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
                 continue
             errors_commit = handler_commit(commit, symbol_in_branch, version)
             real_errors.update(errors_commit)
-    print('commits_order_list is {}'.format(commits_order_list))
+    print('commits_order is {}'.format(commits_order))
     error_version_docs = check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_order)
     real_errors.update(error_version_docs)
     return real_errors
@@ -94,7 +94,7 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_
     error_version_docs = {}
     commit_filename_versions, commit_manifest = get_changed_version(commit_url, commits_order)
     manifest_commits = {}
-    for commit, manifest in commit_manifest.items():
+    for commit, manifest in commit_manifest:
         manifest_commits.setdefault(manifest, [])
         manifest_commits[manifest].append(commit)
     # https://developer.github.com/v3/repos/commits/#compare-two-commits
@@ -291,8 +291,8 @@ def get_changed_version(commit_url, commits_order):
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
     print('commit_manifest\n{}'.format(commit_manifest))
-    commit_manifest2 = {**commits_order, **commit_manifest}
-    print('commit_manifest\n{}'.format(commit_manifest2))
+    commit_manifest = list((i, commit_manifest.get(i)) for i in commits_order)
+    print('commit_manifest\n{}'.format(commit_manifest))
     return commit_filename_versions, commit_manifest
 
 
