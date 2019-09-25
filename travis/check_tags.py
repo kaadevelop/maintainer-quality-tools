@@ -28,9 +28,7 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         print('GITHUB API response for commits: %s', [resp, resp.headers, commits])
     commit_url = {}
     sha_commits = []
-    commits_order = collections.OrderedDict()
     commits_order = []
-    i = 0
     for commit in commits:
         parents_commit = commit.get('parents')
         if len(parents_commit) > 1:
@@ -40,8 +38,6 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
         sha = commit.get('sha')
         commit = commit.get('commit').get('message')
         print('Commit: %s' % commit)
-        # i += 1
-        # commits_order.setdefault(commit, i)
         commits_order.append(commit)
         commit_url.update({commit: url_commit})
         sha_commits.append(sha)
@@ -51,7 +47,6 @@ def get_errors_msgs_commits(travis_repo_slug, travis_pull_request_number, travis
                 continue
             errors_commit = handler_commit(commit, symbol_in_branch, version)
             real_errors.update(errors_commit)
-    print('commits_order is {}'.format(commits_order))
     error_version_docs = check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_order)
     real_errors.update(error_version_docs)
     return real_errors
@@ -275,7 +270,6 @@ def get_changed_version(commit_url, commits_order):
         if release_tag == []:
             continue
         files = commit_content.get('files')
-        print('files\n{}'.format(files))
         for file in files:
             filename = file.get('filename')
             patch = file.get('patch')
@@ -290,9 +284,7 @@ def get_changed_version(commit_url, commits_order):
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
-    print('commit_manifest\n{}'.format(commit_manifest))
     commit_manifest = list((i, commit_manifest.get(i)) for i in commits_order)
-    print('commit_manifest\n{}'.format(commit_manifest))
     return commit_filename_versions, commit_manifest
 
 
