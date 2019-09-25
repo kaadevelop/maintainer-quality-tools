@@ -286,7 +286,7 @@ def get_changed_version(commit_url, commits_dict):
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
     print('commit_manifest\n{}'.format(commit_manifest))
-    z = {**commits_dict, **commit_manifest}
+    z = {**commit_manifest, **commits_dict}
     print('z is {}'.format(z))
     return commit_filename_versions, commit_manifest
 
