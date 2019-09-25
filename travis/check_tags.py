@@ -286,7 +286,7 @@ def get_changed_version(commit_url, commits_dict):
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
     print('commit_manifest\n{}'.format(commit_manifest))
-    sorted_pair_list = sorted(commit_manifest.items(), key=lambda x: commits_dict.get(x))
+    sorted_pair_list = sorted(commit_manifest.items(), key=list(commits_dict.keys()))
     print('sorted_pair_list is {}'.format(sorted_pair_list))
     return commit_filename_versions, commit_manifest
 
