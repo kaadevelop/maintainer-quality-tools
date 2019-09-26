@@ -287,6 +287,7 @@ def get_changed_version(commit_url, commits_order):
             if '__manifest__.py' in filename:
                 commit_manifest[commit_msg] = filename
             if 'doc/changelog.rst' in filename:
+                print('patch from doc/changelog.rst\n{}'.format(patch))
                 raw_url = file.get('raw_url')
                 resp = requests.get(raw_url)
                 changelog_content = resp.text
