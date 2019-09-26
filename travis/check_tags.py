@@ -291,9 +291,8 @@ def get_changed_version(commit_url, commits_order):
                 versions = sorted(versions)
                 raw_url = file.get('raw_url')
                 resp = requests.get(raw_url)
-                print('resp\n{}'.format(resp))
-                # changelog_content = resp.json()
-                # print('changelog_content\n{}'.format(changelog_content))
+                changelog_content = resp.text
+                print('changelog_content\n{}'.format(changelog_content))
                 filename_versions.update({filename: versions})
             if 'doc/index.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
