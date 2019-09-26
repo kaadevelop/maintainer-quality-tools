@@ -89,6 +89,7 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_
     error_version_docs = {}
     commit_filename_versions, commit_manifest = get_changed_version(commit_url, commits_order)
     print('commit_manifest\n{}'.format(commit_manifest))
+    print('commit_filename_versions\n{}'.format(commit_filename_versions))
     manifest_commits = {}
     for commit, manifest in commit_manifest:
         if manifest is None:
@@ -120,12 +121,14 @@ def check_changelog_index_readme(commit_filename_versions):
         i += 1
         list_changed_files = [filename for filename in filename_versions.keys()]
         error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog, i)
+        print('error_change_changelog_index_readme\n{}'.format(error_change_changelog_index_readme))
         error_changelog_manifest_index_readme.update(error_change_changelog_index_readme)
         error_changelog = {}
         for filename, versions in filename_versions.items():
             if changelog not in filename:
                 continue
             error_changelog = check_changelog_version(filename, commit_msg, versions, i)
+            print('error_changelog\n{}'.format(error_changelog))
             error_changelog.update(error_changelog)
         error_changelog_manifest_index_readme.update(error_changelog)
     return error_changelog_manifest_index_readme
