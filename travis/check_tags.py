@@ -287,6 +287,7 @@ def get_changed_version(commit_url, commits_order):
             if '__manifest__.py' in filename:
                 commit_manifest[commit_msg] = filename
             if 'doc/changelog.rst' in filename:
+                print('patch changelog\n{}'.format(patch))
                 versions = re.findall(r'(\d+.\d+.\d+)', patch)
                 versions = sorted(versions)
                 filename_versions.update({filename: versions})
