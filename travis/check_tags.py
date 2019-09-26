@@ -293,7 +293,7 @@ def get_changed_version(commit_url, commits_order):
                 resp = requests.get(raw_url)
                 changelog_content = resp.text
                 versions = re.findall(r'(\d+.\d+.\d+)', changelog_content)
-                print('changelog_content\n{}'.format(changelog_content))
+                print('versions\n{}'.format(versions))
                 versions = [versions[0], versions[1]]
                 filename_versions.update({filename: versions})
             if 'doc/index.rst' in filename:
