@@ -109,6 +109,7 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_
         print('error_manifest\n{}'.format(error_manifest))
         error_version_docs.update(error_manifest)
     error_changelog_index_readme = check_changelog_index_readme(commit_filename_versions)
+    print('error_changelog_index_readme\n{}'.format(error_changelog_index_readme))
     error_version_docs.update(error_changelog_index_readme)
     return error_version_docs
 
@@ -295,6 +296,7 @@ def get_changed_version(commit_url, commits_order):
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
     commit_manifest = list((i, commit_manifest.get(i)) for i in commits_order_filtered)
+    print('commit_filename_versions\n{}'.format(commit_filename_versions))
     return commit_filename_versions, commit_manifest
 
 
