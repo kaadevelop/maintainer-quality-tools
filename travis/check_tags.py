@@ -129,7 +129,7 @@ def get_manifest_version(travis_repo_slug, sha_commits):
     sha_start = sha_commits[0]
     sha_end = sha_commits[-1]
     # GET /repos/:owner/:repo/compare/:base...:head
-    url_request = 'https://github.it-projects.info/repos/{}/compare/{}...{}'.format(
+    url_request = 'https://github.it-projects.info/repos/{}/compare/{}~1...{}'.format(
         str(travis_repo_slug), str(sha_start),  str(sha_end))
     resp = requests.get(url_request)
     compare = resp.json()
