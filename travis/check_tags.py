@@ -88,28 +88,22 @@ def handler_commit(commit, symbol_in_branch, version):
 def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_order):
     error_version_docs = {}
     commit_filename_versions, commit_manifest, error_update_of_version_changlog = get_changed_version(commit_url, commits_order)
-    print('commit_manifest\n{}'.format(commit_manifest))
-    print('commit_filename_versions\n{}'.format(commit_filename_versions))
     manifest_commits = {}
     for commit, manifest in commit_manifest:
         if manifest is None:
             continue
         manifest_commits.setdefault(manifest, [])
         manifest_commits[manifest].append(commit)
-    print('manifest_commits\n{}'.format(manifest_commits))
     # https://developer.github.com/v3/repos/commits/#compare-two-commits
     manifest_version = get_manifest_version(travis_repo_slug, sha_commits)
-    print('manifest_version\n{}'.format(manifest_version))
     i = 0
     for manifest, commit in manifest_commits.items():
         i += 1
         versions = manifest_version.get(manifest)
         str_commit = ', '.join(commit)
         error_manifest = check_manifest_version(manifest, versions, str_commit, i)
-        print('error_manifest\n{}'.format(error_manifest))
         error_version_docs.update(error_manifest)
     error_changelog_index_readme = check_changelog_index_readme(commit_filename_versions)
-    print('error_changelog_index_readme\n{}'.format(error_changelog_index_readme))
     error_version_docs.update(error_changelog_index_readme)
     return error_version_docs
 
@@ -297,6 +291,7 @@ def get_changed_version(commit_url, commits_order):
                     changelog_content = resp.text
                     versions = re.findall(r'(\d+.\d+.\d+)', changelog_content)
                     versions = [update_of_version_from_patch, versions[1]]
+                    print('versions changelog before sort\n{}'.format(versions))
                     versions = sorted(versions)
                     filename_versions.update({filename: versions})
                 else:
@@ -308,6 +303,8 @@ def get_changed_version(commit_url, commits_order):
         commit_filename_versions[commit_msg] = filename_versions
     commit_manifest = list((i, commit_manifest.get(i)) for i in commits_order_filtered)
     print('error_update_of_version_changlog\n{}'.format(error_update_of_version_changlog))
+    print()
+    print('commit_filename_versions\n{}'.format(commit_filename_versions))
     return commit_filename_versions, commit_manifest, error_update_of_version_changlog
 
 
