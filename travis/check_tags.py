@@ -87,7 +87,12 @@ def handler_commit(commit, symbol_in_branch, version):
 
 def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_order):
     error_version_docs = {}
+    error_changelog_msg_value = 'If you use one of tags :sparkles:, :zap: or :ambulance: the version in the changelog must be updated!'
+    error_changelog_msg_key = 'commit: {}\nchangelog: {}'
     commit_filename_versions, commit_manifest, error_update_of_version_changlog = get_changed_version(commit_url, commits_order)
+    for commit, changelog in error_update_of_version_changlog.items():
+        error_changelog = {error_changelog_msg_key.format(commit, changelog): error_changelog_msg_value}
+        error_version_docs.update(error_changelog)
     manifest_commits = {}
     for commit, manifest in commit_manifest:
         if manifest is None:
@@ -116,14 +121,12 @@ def check_changelog_index_readme(commit_filename_versions):
         i += 1
         list_changed_files = [filename for filename in filename_versions.keys()]
         error_change_changelog_index_readme = get_change_changelog_index_readme_file(commit_msg, list_changed_files, changelog, i)
-        print('error_change_changelog_index_readme\n{}'.format(error_change_changelog_index_readme))
         error_changelog_manifest_index_readme.update(error_change_changelog_index_readme)
         error_changelog = {}
         for filename, versions in filename_versions.items():
             if changelog not in filename:
                 continue
             error_changelog = check_changelog_version(filename, commit_msg, versions, i)
-            print('error_changelog\n{}'.format(error_changelog))
             error_changelog.update(error_changelog)
         error_changelog_manifest_index_readme.update(error_changelog)
     return error_changelog_manifest_index_readme
@@ -282,7 +285,6 @@ def get_changed_version(commit_url, commits_order):
             if '__manifest__.py' in filename:
                 commit_manifest[commit_msg] = filename
             if 'doc/changelog.rst' in filename:
-                print('patch from doc/changelog.rst\n{}'.format(patch))
                 update_of_version_from_patch = re.search(r'\+`(\d+.\d+.\d+)', patch)
                 if update_of_version_from_patch:
                     update_of_version_from_patch = update_of_version_from_patch.group(1)
@@ -291,7 +293,6 @@ def get_changed_version(commit_url, commits_order):
                     changelog_content = resp.text
                     versions = re.findall(r'(\d+.\d+.\d+)', changelog_content)
                     versions = [update_of_version_from_patch, versions[1]]
-                    print('versions changelog before sort\n{}'.format(versions))
                     versions = sorted(versions)
                     filename_versions.update({filename: versions})
                 else:
@@ -302,9 +303,6 @@ def get_changed_version(commit_url, commits_order):
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
     commit_manifest = list((i, commit_manifest.get(i)) for i in commits_order_filtered)
-    print('error_update_of_version_changlog\n{}'.format(error_update_of_version_changlog))
-    print()
-    print('commit_filename_versions\n{}'.format(commit_filename_versions))
     return commit_filename_versions, commit_manifest, error_update_of_version_changlog
 
 
