@@ -124,6 +124,8 @@ def check_changelog_index_readme(commit_filename_versions):
 
 
 def get_manifest_version(travis_repo_slug, sha_commits):
+    print('travis_repo_slug\n{}'.format(travis_repo_slug))
+    print('sha_commits\n{}'.format(sha_commits))
     manifest = '__manifest__.py'
     sha_start = sha_commits[0]
     sha_end = sha_commits[-1]
