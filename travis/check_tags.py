@@ -89,6 +89,9 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_
     error_version_docs = {}
     commit_filename_versions, commit_manifest = get_changed_version(commit_url, commits_order)
     manifest_commits = {}
+    print('commit_filename_versions\n{}'.format(commit_filename_versions))
+    print()
+    print('commit_manifest\n{}'.format(commit_manifest))
     for commit, manifest in commit_manifest:
         if manifest is None:
             continue
