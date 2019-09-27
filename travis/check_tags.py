@@ -124,15 +124,12 @@ def check_changelog_index_readme(commit_filename_versions):
 
 
 def get_manifest_version(travis_repo_slug, sha_commits):
-    print('travis_repo_slug\n{}'.format(travis_repo_slug))
-    print('sha_commits\n{}'.format(sha_commits))
     manifest = '__manifest__.py'
     sha_start = sha_commits[0]
     sha_end = sha_commits[-1]
     # GET /repos/:owner/:repo/compare/:base...:head
     url_request = 'https://github.it-projects.info/repos/{}/compare/{}...{}'.format(
         str(travis_repo_slug), str(sha_start),  str(sha_end))
-    print('url_request\n'.format(url_request))
     resp = requests.get(url_request)
     compare = resp.json()
     if resp.status_code != 200:
@@ -144,10 +141,11 @@ def get_manifest_version(travis_repo_slug, sha_commits):
         if manifest not in filename:
             continue
         patch = file.get('patch')
-        print('filename\n'.format(filename))
-        print('patch\n'.format(patch))
+        print('filename\n{}'.format(filename))
+        print('patch\n{}'.format(patch))
         versions = re.findall(r'(\d+.\d+.\d+.\d+.\d+)', patch)
         manifest_versions[filename] = versions
+    print('manifest_versions\n{}'.format(manifest_versions))
     return manifest_versions
 
 
