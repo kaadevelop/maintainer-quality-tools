@@ -87,7 +87,7 @@ def handler_commit(commit, symbol_in_branch, version):
 
 def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_order):
     error_version_docs = {}
-    commit_filename_versions, commit_manifest = get_changed_version(commit_url, commits_order)
+    commit_filename_versions, commit_manifest, error_update_of_version_changlog = get_changed_version(commit_url, commits_order)
     print('commit_manifest\n{}'.format(commit_manifest))
     print('commit_filename_versions\n{}'.format(commit_filename_versions))
     manifest_commits = {}
@@ -270,6 +270,7 @@ def get_changed_version(commit_url, commits_order):
     tags = [':sparkles:', ':zap:', ':ambulance:']
     commit_filename_versions = {}
     commit_manifest = {}
+    error_update_of_version_changlog = {}
     for commit, url in commit_url.items():
         filename_versions = {}
         url = url.replace('api.github.com', 'github.it-projects.info')
@@ -288,21 +289,26 @@ def get_changed_version(commit_url, commits_order):
                 commit_manifest[commit_msg] = filename
             if 'doc/changelog.rst' in filename:
                 print('patch from doc/changelog.rst\n{}'.format(patch))
-                raw_url = file.get('raw_url')
-                resp = requests.get(raw_url)
-                changelog_content = resp.text
-                versions = re.findall(r'(\d+.\d+.\d+)', changelog_content)
-                versions = [versions[0], versions[1]]
-                versions = sorted(versions)
-                filename_versions.update({filename: versions})
+                update_of_version_from_patch = re.search(r'\+`(\d+.\d+.\d+)', patch)
+                if update_of_version_from_patch:
+                    update_of_version_from_patch = update_of_version_from_patch.group(1)
+                    raw_url = file.get('raw_url')
+                    resp = requests.get(raw_url)
+                    changelog_content = resp.text
+                    versions = re.findall(r'(\d+.\d+.\d+)', changelog_content)
+                    versions = [update_of_version_from_patch, versions[1]]
+                    versions = sorted(versions)
+                    filename_versions.update({filename: versions})
+                else:
+                    error_update_of_version_changlog.update({commit: filename})
             if 'doc/index.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
             if 'README.rst' in filename:
                 filename_versions.update({filename: 'Updated!'})
         commit_filename_versions[commit_msg] = filename_versions
     commit_manifest = list((i, commit_manifest.get(i)) for i in commits_order_filtered)
-    print('commit_filename_versions\n{}'.format(commit_filename_versions))
-    return commit_filename_versions, commit_manifest
+    print('error_update_of_version_changlog\n{}'.format(error_update_of_version_changlog))
+    return commit_filename_versions, commit_manifest, error_update_of_version_changlog
 
 
 def check_version_tags(version_tags, list_tags, commit, version):
