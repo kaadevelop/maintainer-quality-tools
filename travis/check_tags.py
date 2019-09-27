@@ -129,12 +129,13 @@ def get_manifest_version(travis_repo_slug, sha_commits):
     sha_end = sha_commits[-1]
     # GET /repos/:owner/:repo/compare/:base...:head
     url_request = 'https://github.it-projects.info/repos/%s/compare/%s...%s' % (
-                            str(travis_repo_slug), str(sha_start),  str(sha_end))
+        str(travis_repo_slug), str(sha_start),  str(sha_end))
     resp = requests.get(url_request)
     compare = resp.json()
     if resp.status_code != 200:
         print('GITHUB API response for compare two commits: %s', [resp, resp.headers, compare])
     updated_files = compare.get('files')
+    print('updated_files\n'.format(updated_files))
     manifest_versions = {}
     for file in updated_files:
         filename = file.get('filename')
