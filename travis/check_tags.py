@@ -96,7 +96,6 @@ def check_stable_branch_docs(commit_url, sha_commits, travis_repo_slug, commits_
         manifest_commits[manifest].append(commit)
     # https://developer.github.com/v3/repos/commits/#compare-two-commits
     manifest_version = get_manifest_version(travis_repo_slug, sha_commits)
-    print('manifest_version\n'.format(manifest_version))
     for manifest, commit in manifest_commits.items():
         versions = manifest_version.get(manifest)
         str_commit = ', '.join(commit)
@@ -142,6 +141,8 @@ def get_manifest_version(travis_repo_slug, sha_commits):
         if manifest not in filename:
             continue
         patch = file.get('patch')
+        print('filename\n'.format(filename))
+        print('patch\n'.format(patch))
         versions = re.findall(r'(\d+.\d+.\d+.\d+.\d+)', patch)
         manifest_versions[filename] = versions
     return manifest_versions
